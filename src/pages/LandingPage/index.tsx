@@ -4,19 +4,23 @@ import {
 	Flex,
 	FormControl,
 	Heading,
+	Icon,
 	IconButton,
 	Img,
 	Input,
 	InputGroup,
 	InputLeftElement,
 	Link,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
 	SimpleGrid,
 	Text,
 	VStack,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import {
-	HiArrowLeft,
 	HiArrowRight,
 	HiChevronDown,
 	HiGlobeAsiaAustralia,
@@ -27,6 +31,7 @@ import {
 	HiSun,
 	HiVideoCamera,
 } from "react-icons/hi2";
+import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
 export const LandingPage = () => {
 	return (
@@ -53,7 +58,17 @@ const Navbar = () => {
 		>
 			<Heading fontSize={"2xl"}>OnReserve</Heading>
 			<ButtonGroup variant={"ghost"} flex="1" size={"sm"}>
-				<Button rightIcon={<HiChevronDown />}>Events</Button>
+				<Menu size={"sm"}>
+					<MenuButton as={Button} rightIcon={<HiChevronDown />}>
+						Events
+					</MenuButton>
+					<MenuList>
+						<MenuItem>Concerts</MenuItem>
+						<MenuItem>Movies</MenuItem>
+						<MenuItem>Trips</MenuItem>
+						<MenuItem>Camping</MenuItem>
+					</MenuList>
+				</Menu>
 				<Button rightIcon={<HiChevronDown />}>Create</Button>
 				<Button>Ticket</Button>
 				<Button>My Events</Button>
@@ -394,7 +409,12 @@ const TrustedBySection = () => {
 const Footer = () => {
 	return (
 		<Flex direction={"column"} background={"gray.200"}>
-			<SimpleGrid columns={[1, 1, 3]} px="32" py="20">
+			<SimpleGrid
+				columns={[1, 1, 3]}
+				px="32"
+				py="20"
+				justifyItems={"center"}
+			>
 				<Flex direction={"column"}>
 					<Heading mb="5" fontSize={"2xl"}>
 						OnReserve
@@ -429,10 +449,37 @@ const Footer = () => {
 					</VStack>
 				</Flex>
 			</SimpleGrid>
-			<Flex direction={"column"} background={"gray.400"}>
-				<Flex textAlign={"center"}>
+			<Flex direction={"column"} background={"gray.200"}>
+				<Flex
+					p="3"
+					pt="5"
+					justifyContent={"center"}
+					textAlign={"center"}
+				>
 					&copy; {new Date().getFullYear()} OnReserve. All rights
 					reserved.
+				</Flex>
+				<Flex
+					justifyContent={"center"}
+					textAlign={"center"}
+					gap={"5"}
+					p="3"
+				>
+					<Link>
+						<Icon boxSize={"8"}>
+							<FaFacebook />
+						</Icon>
+					</Link>
+					<Link>
+						<Icon boxSize={"8"}>
+							<FaTwitter />
+						</Icon>
+					</Link>
+					<Link>
+						<Icon boxSize={"8"}>
+							<FaInstagram />
+						</Icon>
+					</Link>
 				</Flex>
 			</Flex>
 		</Flex>

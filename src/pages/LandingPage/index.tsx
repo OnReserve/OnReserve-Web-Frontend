@@ -32,6 +32,8 @@ import {
 	HiVideoCamera,
 } from "react-icons/hi2";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import { Navbar } from "../../components/Navbar";
+import { Footer } from "../../components/Footer";
 
 export const LandingPage = () => {
 	return (
@@ -42,59 +44,6 @@ export const LandingPage = () => {
 			<ReasonSection />
 			<TrustedBySection />
 			<Footer />
-		</Flex>
-	);
-};
-
-const Navbar = () => {
-	return (
-		<Flex
-			color="blue.900"
-			px="20"
-			py="10"
-			width={"100%"}
-			alignItems={"center"}
-			gap="5"
-		>
-			<Heading fontSize={"2xl"}>OnReserve</Heading>
-			<ButtonGroup variant={"ghost"} flex="1" size={"sm"}>
-				<Menu size={"sm"}>
-					<MenuButton as={Button} rightIcon={<HiChevronDown />}>
-						Events
-					</MenuButton>
-					<MenuList>
-						<MenuItem>Concerts</MenuItem>
-						<MenuItem>Movies</MenuItem>
-						<MenuItem>Trips</MenuItem>
-						<MenuItem>Camping</MenuItem>
-					</MenuList>
-				</Menu>
-				<Button rightIcon={<HiChevronDown />}>Create</Button>
-				<Button>Ticket</Button>
-				<Button>My Events</Button>
-			</ButtonGroup>
-			<Flex>
-				<FormControl>
-					<InputGroup>
-						<InputLeftElement>
-							<HiMagnifyingGlass />
-						</InputLeftElement>
-						<Input
-							borderRadius={"20px"}
-							variant={"outline"}
-							placeholder="Search"
-						></Input>
-					</InputGroup>
-				</FormControl>
-			</Flex>
-			<ButtonGroup variant={"solid"} borderRadius={"20px"}>
-				<Button variant={"ghost"} borderRadius={"20px"}>
-					Login
-				</Button>
-				<Button colorScheme="blue" borderRadius={"20px"}>
-					Sign Up
-				</Button>
-			</ButtonGroup>
 		</Flex>
 	);
 };
@@ -402,86 +351,6 @@ const TrustedBySection = () => {
 					size={"lg"}
 				/>
 			</SimpleGrid>
-		</Flex>
-	);
-};
-
-const Footer = () => {
-	return (
-		<Flex direction={"column"} background={"gray.200"}>
-			<SimpleGrid
-				columns={[1, 1, 3]}
-				px="32"
-				py="20"
-				justifyItems={"center"}
-			>
-				<Flex direction={"column"}>
-					<Heading mb="5" fontSize={"2xl"}>
-						OnReserve
-					</Heading>
-					<VStack alignItems={"flex-start"}>
-						<Link>Pricing</Link>
-						<Link>Updates</Link>
-						<Link>Beta</Link>
-						<Link>Newsletter</Link>
-					</VStack>
-				</Flex>
-				<Flex direction={"column"}>
-					<Heading mb="5" fontSize={"2xl"}>
-						Events
-					</Heading>
-					<VStack alignItems={"flex-start"}>
-						<Link>Movies</Link>
-						<Link>Concert</Link>
-						<Link>Trip</Link>
-						<Link>Climb</Link>
-					</VStack>
-				</Flex>
-				<Flex direction={"column"}>
-					<Heading mb="5" fontSize={"2xl"}>
-						About
-					</Heading>
-					<VStack alignItems={"flex-start"}>
-						<Link>Company</Link>
-						<Link>Careers</Link>
-						<Link>Legal</Link>
-						<Link>Help</Link>
-					</VStack>
-				</Flex>
-			</SimpleGrid>
-			<Flex direction={"column"} background={"gray.200"}>
-				<Flex
-					p="3"
-					pt="5"
-					justifyContent={"center"}
-					textAlign={"center"}
-				>
-					&copy; {new Date().getFullYear()} OnReserve. All rights
-					reserved.
-				</Flex>
-				<Flex
-					justifyContent={"center"}
-					textAlign={"center"}
-					gap={"5"}
-					p="3"
-				>
-					<Link>
-						<Icon boxSize={"8"}>
-							<FaFacebook />
-						</Icon>
-					</Link>
-					<Link>
-						<Icon boxSize={"8"}>
-							<FaTwitter />
-						</Icon>
-					</Link>
-					<Link>
-						<Icon boxSize={"8"}>
-							<FaInstagram />
-						</Icon>
-					</Link>
-				</Flex>
-			</Flex>
 		</Flex>
 	);
 };

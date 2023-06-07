@@ -1,12 +1,23 @@
-import { Button, Flex, Heading, Link, Text } from "@chakra-ui/react";
+import { Button, Flex, Heading, Link, Text, useToast } from "@chakra-ui/react";
 import { useFormik } from "formik";
-import { FaFacebook, FaGoogle } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
-import { SeparatorWithLabel } from "./components/Separator";
+import { NavLink, useNavigate } from "react-router-dom";
 import { loginSchema } from "./lib/schema";
 import { FormikInput } from "./components/FormikInput";
+import { AxiosError } from "axios";
+import { useUser } from "../../state/userState";
+import { useEffect } from "react";
+import { userAPI } from "$lib/api/auth";
 
 export const Login = () => {
+	const user = useUser((state) => state.user);
+	const router = useNavigate();
+
+	useEffect(() => {
+		if (user) {
+			router("/profile");
+		}
+	}, [user]);
+
 	return (
 		<Flex
 			width={"100%"}
@@ -70,14 +81,28 @@ export const Login = () => {
 };
 
 const LoginForm = () => {
+	const setUser = useUser((state) => state.setUser);
+	const toast = useToast();
 	const formik = useFormik({
 		validationSchema: loginSchema,
 		initialValues: {
 			email: "",
 			password: "",
 		},
-		onSubmit: (values) => {
-			console.log(values);
+		onSubmit: async (values) => {
+			try {
+				const user = await userAPI.login(values);
+				setUser(user);
+			} catch (err) {
+				if (err instanceof AxiosError) {
+					toast({
+						title: "Login Failed",
+						description: err.response?.data.message,
+						status: "error",
+						position: "bottom-right",
+					});
+				}
+			}
 		},
 	});
 

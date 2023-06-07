@@ -4,27 +4,33 @@ import {
 	AccordionIcon,
 	AccordionItem,
 	AccordionPanel,
+	Alert,
+	AlertDescription,
+	AlertIcon,
+	AlertTitle,
 	Badge,
 	Button,
 	Divider,
 	Flex,
+	FormControl,
+	FormLabel,
 	HStack,
 	Heading,
 	Icon,
 	Img,
+	Input,
 	Skeleton,
 	Tag,
 	Text,
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
-import {
-	HiCalendar,
-	HiCheckBadge,
-	HiClock,
-	HiOutlineClock,
-} from "react-icons/hi2";
+import { HiCalendar, HiCheckBadge, HiOutlineClock } from "react-icons/hi2";
 import { NavLink } from "react-router-dom";
 import { Footer } from "../../components/Footer";
+import { useQuery } from "@tanstack/react-query";
+import { IEventUserResponse, eventAPI } from "$lib/api/event";
+import { formatDateForUserEvent } from "$config/dayjs.config";
+import dayjs from "dayjs";
 
 export const EventsPage = () => {
 	return (
@@ -33,13 +39,14 @@ export const EventsPage = () => {
 			<Flex
 				px="20"
 				py="10"
-				background={"gray.200"}
+				background={"gray.100"}
 				flex={"1"}
 				gap={"10"}
 				alignItems={"flex-start"}
+				minH={"100vh"}
 			>
 				<FilterSection />
-				<Flex direction="column" flex={"2"}>
+				<Flex direction="column" flex={"3"}>
 					<ResultSection />
 				</Flex>
 			</Flex>
@@ -50,12 +57,7 @@ export const EventsPage = () => {
 
 const FilterSection = () => {
 	return (
-		<Flex
-			direction={"column"}
-			flex={"1"}
-			background={"white"}
-			borderRadius={"lg"}
-		>
+		<Flex direction={"column"} flex={"1"} borderRadius={"lg"}>
 			<Accordion allowToggle>
 				<AccordionItem>
 					<AccordionButton>
@@ -66,7 +68,16 @@ const FilterSection = () => {
 					</AccordionButton>
 					<AccordionPanel>
 						<Flex direction={"column"}>
-							<Button>Apply Filter</Button>
+							<FormControl>
+								<FormLabel>Date & Time</FormLabel>
+								<Flex>
+									<Input type="date" />
+									<Input type="date" />
+								</Flex>
+							</FormControl>
+							<Button colorScheme="blue" size={"sm"}>
+								Apply Filter
+							</Button>
 						</Flex>
 					</AccordionPanel>
 				</AccordionItem>
@@ -77,26 +88,39 @@ const FilterSection = () => {
 };
 
 const ResultSection = () => {
+	const upcomingEvents = useQuery({
+		queryKey: ["upcomingEvents"],
+		queryFn: () => eventAPI.getUpcomingEvents(),
+	});
+
+	if (upcomingEvents.isLoading) {
+		return (
+			<Flex direction={"column"} borderRadius={"lg"} gap={"3"}>
+				{[...Array(6)].map((_v, _i) => (
+					<EventLoading />
+				))}
+			</Flex>
+		);
+	}
+
+	if (upcomingEvents.error) {
+		return (
+			<Alert flexDirection={"column"} status="error">
+				<AlertIcon boxSize={"10"} mb="4" />
+				<AlertTitle>Error Loading events</AlertTitle>
+				<AlertDescription>
+					Check your connection and Refresh the page
+				</AlertDescription>
+			</Alert>
+		);
+	}
+
 	return (
-		<Flex
-			direction={"column"}
-			background={"white"}
-			borderRadius={"lg"}
-			gap={"1"}
-		>
-			<EventCard />
-			<Divider />
-			<EventCard />
-			<Divider />
-			<EventCard />
-			<Divider />
-			<EventCard />
-			<Divider />
-			<EventCard />
-			<Divider />
-			<EventCard />
-			<Divider />
-			<EventLoading />
+		<Flex direction={"column"} borderRadius={"lg"} gap={"1"}>
+			{upcomingEvents.data &&
+				upcomingEvents.data.map((event) => (
+					<EventCard event={event} key={event.id} />
+				))}
 		</Flex>
 	);
 };
@@ -105,18 +129,20 @@ const EventLoading = () => {
 	return <Skeleton width={"100%"} h="200px" borderRadius={"md"}></Skeleton>;
 };
 
-const EventCard = () => {
+const EventCard = ({ event }: { event: IEventUserResponse }) => {
 	return (
 		<Flex
 			as={NavLink}
-			to="/events/123"
-			m="4"
+			to={`/events/${event.id}`}
+			my="1"
 			p="5"
 			borderRadius={"md"}
+			background={"white"}
 			cursor={"pointer"}
 			transition={"all 300ms ease-out"}
+			boxShadow={"base"}
 			_hover={{
-				background: "blackAlpha.100",
+				boxShadow: "md",
 			}}
 		>
 			<Img
@@ -124,7 +150,7 @@ const EventCard = () => {
 				width={"40"}
 				height={"40"}
 				objectFit={"fill"}
-				src={`https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80`}
+				src={event.galleries[0].eventPhoto}
 				borderRadius={"md"}
 			></Img>
 			<Flex
@@ -134,11 +160,9 @@ const EventCard = () => {
 				p="2"
 			>
 				<Flex direction={"column"} gap={"2"}>
-					<Heading fontSize={"xl"}>
-						Rophnan's My Generation Concert
-					</Heading>
+					<Heading fontSize={"xl"}>{event.title}</Heading>
 					<HStack>
-						<Text>Addis Concert Organizers </Text>
+						<Text>{event.company?.name}</Text>
 						<Text color="blue.500">
 							<HiCheckBadge />
 						</Text>
@@ -149,7 +173,8 @@ const EventCard = () => {
 							textTransform={"uppercase"}
 							fontSize={"sm"}
 						>
-							<HiCalendar /> Jan 20, 2023
+							<HiCalendar />{" "}
+							{formatDateForUserEvent(event.eventStartTime)}
 						</Text>
 						<Text
 							textTransform={"uppercase"}
@@ -157,24 +182,21 @@ const EventCard = () => {
 							fontSize={"sm"}
 						>
 							<HiOutlineClock />
-							03:00 AM
+							{dayjs(event.eventStartTime).format("hh:mm A")}
 						</Text>
 					</Flex>
 				</Flex>
 				<Flex justifyContent={"space-between"}>
 					<HStack>
 						<Tag variant={"subtle"} colorScheme="blue">
-							Normal
+							Economy
 						</Tag>
 						<Tag variant={"outline"} colorScheme="blue">
 							VIP
 						</Tag>
-						<Tag variant={"solid"} colorScheme="blue">
-							VVIP
-						</Tag>
 					</HStack>
 					<Text>
-						Starting from <b>800ETB</b>
+						Starting from <b>{event.economyPrice}ETB</b>
 					</Text>
 				</Flex>
 			</Flex>

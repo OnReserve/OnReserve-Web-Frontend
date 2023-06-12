@@ -8,6 +8,7 @@ import { ReservationPage } from "$pages/Reserve/Reserve";
 import { ProfileViewPage } from "$pages/Profile/ProfileView";
 import { CompanyDetailsPage } from "$pages/Company/CompanyDetails";
 import { AddEventPage } from "$pages/Events/AddEvents";
+import { EditEventPage } from "$pages/Events/EditEvents";
 
 const routerConfig = createBrowserRouter([
 	{
@@ -33,6 +34,10 @@ const routerConfig = createBrowserRouter([
 	{
 		path: "/event/add",
 		element: <AddEventPage />,
+	},
+	{
+		path: "/event/edit/:eventId",
+		element: <EditEventPage />,
 	},
 	{
 		path: "/reserve/:eventId",

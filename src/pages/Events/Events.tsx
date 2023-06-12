@@ -19,9 +19,15 @@ import {
 	Icon,
 	Img,
 	Input,
+	RangeSlider,
+	RangeSliderFilledTrack,
+	RangeSliderThumb,
+	RangeSliderTrack,
+	Select,
 	Skeleton,
 	Tag,
 	Text,
+	useRangeSlider,
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
 import { HiCalendar, HiCheckBadge, HiOutlineClock } from "react-icons/hi2";
@@ -31,6 +37,9 @@ import { useQuery } from "@tanstack/react-query";
 import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
+import { useState } from "react";
+import { useCategories } from "$lib/hooks/useCategories";
+import { useFilter } from "../../state/filterState";
 
 export const EventsPage = () => {
 	return (
@@ -56,11 +65,21 @@ export const EventsPage = () => {
 };
 
 const FilterSection = () => {
+	const [priceRange, setPriceRange] = useState([100, 500]);
+	const categories = useCategories();
+	const filter = useFilter((state) => state.filter);
+	const setFilter = useFilter((state) => state.setFilterItem);
+
 	return (
-		<Flex direction={"column"} flex={"1"} borderRadius={"lg"}>
+		<Flex
+			direction={"column"}
+			flex={"1"}
+			borderRadius={"lg"}
+			background={"white"}
+		>
 			<Accordion allowToggle>
 				<AccordionItem>
-					<AccordionButton>
+					<AccordionButton border={"none"}>
 						<Heading size={"sm"} flex="1">
 							Filters
 						</Heading>
@@ -68,14 +87,130 @@ const FilterSection = () => {
 					</AccordionButton>
 					<AccordionPanel>
 						<Flex direction={"column"}>
-							<FormControl>
-								<FormLabel>Date & Time</FormLabel>
-								<Flex>
-									<Input type="date" />
-									<Input type="date" />
-								</Flex>
-							</FormControl>
-							<Button colorScheme="blue" size={"sm"}>
+							<Flex gap={"5"} mb="3">
+								<FormControl isDisabled={categories.isLoading}>
+									<FormLabel>Event Type</FormLabel>
+									<Select
+										value={filter.categoryId}
+										onChange={(event) =>
+											setFilter(
+												"categoryId",
+												parseInt(event.target.value)
+											)
+										}
+										size={"sm"}
+									>
+										{categories.data &&
+											categories.data.map((_category) => (
+												<option value={_category.id}>
+													{_category.name}
+												</option>
+											))}
+									</Select>
+								</FormControl>
+							</Flex>
+							<Flex gap={"5"} mb="3">
+								<FormControl>
+									<FormLabel>From</FormLabel>
+									<Input
+										value={filter.eventStartDate}
+										onChange={(event) =>
+											setFilter(
+												"eventStartDate",
+												event.target.value
+											)
+										}
+										type="date"
+										size={"sm"}
+									/>
+								</FormControl>
+								<FormControl>
+									<FormLabel>To</FormLabel>
+									<Input
+										value={filter.eventEndDate}
+										onChange={(event) =>
+											setFilter(
+												"eventEndDate",
+												event.target.value
+											)
+										}
+										type="date"
+										size={"sm"}
+									/>
+								</FormControl>
+							</Flex>
+							<Flex gap={"5"} mb="3">
+								<FormControl>
+									<FormLabel>Location</FormLabel>
+									<Input
+										value={filter.location}
+										onChange={(event) =>
+											setFilter(
+												"location",
+												event.target.value
+											)
+										}
+										type="text"
+										size={"sm"}
+										variant={"filled"}
+									/>
+								</FormControl>
+							</Flex>
+							<Flex gap={"5"} mb="3">
+								<FormControl>
+									<FormLabel>Price</FormLabel>
+									<RangeSlider
+										min={100}
+										max={1000}
+										step={50}
+										defaultValue={priceRange}
+										value={priceRange}
+										onChange={(val) => setPriceRange(val)}
+									>
+										<RangeSliderTrack>
+											<RangeSliderFilledTrack />
+										</RangeSliderTrack>
+										<RangeSliderThumb index={0} />
+										<RangeSliderThumb index={1} />
+									</RangeSlider>
+									<Flex
+										justifyContent={"space-between"}
+										gap={"5"}
+									>
+										<Input
+											placeholder="min"
+											type="number"
+											size="sm"
+											variant={"filled"}
+											value={priceRange[0]}
+											onChange={(event) =>
+												setPriceRange((val) => [
+													parseInt(
+														event.target?.value
+													),
+													val[1],
+												])
+											}
+										/>
+										<Input
+											placeholder="max"
+											type="number"
+											size="sm"
+											variant={"filled"}
+											value={priceRange[1]}
+											onChange={(event) =>
+												setPriceRange((val) => [
+													val[0],
+													parseInt(
+														event.target?.value
+													),
+												])
+											}
+										/>
+									</Flex>
+								</FormControl>
+							</Flex>
+							<Button mt="10" colorScheme="blue" size={"sm"}>
 								Apply Filter
 							</Button>
 						</Flex>
@@ -188,12 +323,16 @@ const EventCard = ({ event }: { event: IEventUserResponse }) => {
 				</Flex>
 				<Flex justifyContent={"space-between"}>
 					<HStack>
-						<Tag variant={"subtle"} colorScheme="blue">
-							Economy
-						</Tag>
-						<Tag variant={"outline"} colorScheme="blue">
-							VIP
-						</Tag>
+						{event.economySeats && (
+							<Tag variant={"subtle"} colorScheme="blue">
+								Economy
+							</Tag>
+						)}
+						{event.vipSeats && (
+							<Tag variant={"outline"} colorScheme="blue">
+								VIP
+							</Tag>
+						)}
 					</HStack>
 					<Text>
 						Starting from <b>{event.economyPrice}ETB</b>

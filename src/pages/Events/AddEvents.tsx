@@ -43,8 +43,13 @@ import { eventAPI } from "$lib/api/event";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { categoryAPI } from "$lib/api/categories";
+import { useCategories } from "$lib/hooks/useCategories";
 
-export const AddEventPage = () => {
+interface IAddEventPage {
+	isEdit?: boolean;
+}
+
+export const AddEventPage = ({ isEdit }: IAddEventPage) => {
 	return (
 		<AuthGuard>
 			<Flex direction={"column"}>
@@ -56,7 +61,7 @@ export const AddEventPage = () => {
 					background={"gray.100"}
 					direction={"column"}
 				>
-					<AddEventForm />
+					<AddEventForm isEdit={isEdit} />
 				</Flex>
 				<Footer />
 			</Flex>
@@ -150,7 +155,7 @@ const CompanySelect = () => {
 	);
 };
 
-const AddEventForm = () => {
+const AddEventForm = ({ isEdit }: { isEdit?: boolean }) => {
 	const user = useUser((state) => state.user);
 	const navigate = useNavigate();
 	const toast = useToast();
@@ -395,10 +400,7 @@ function ImageUpload({ formik }: { formik: FormikProps<IAddEventForm> }) {
 
 const CategoryInput = ({ formik }: { formik: FormikProps<IAddEventForm> }) => {
 	const user = useUser((state) => state.user);
-	const category = useQuery({
-		queryKey: ["loadCategories"],
-		queryFn: () => categoryAPI.getCategories(user),
-	});
+	const category = useCategories();
 	return (
 		<Flex my="10">
 			<FormControl isDisabled={category.isLoading}>

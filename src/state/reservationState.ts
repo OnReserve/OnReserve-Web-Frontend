@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-type PackageType = "NORMAL" | "VIP" | "VVIP";
+type PackageType = "NORMAL" | "VIP";
 
 type State = {
 	packages: PackageType[];

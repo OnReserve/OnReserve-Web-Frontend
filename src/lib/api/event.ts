@@ -2,6 +2,7 @@ import { IAddEventForm } from "$pages/Events/AddEvents";
 import axios from "axios";
 import { ILoginResponse } from "./auth";
 import { baseURL } from "$config/api";
+import { IEditEventForm } from "$pages/Events/EditEvents";
 
 const addEvent = async (
 	user: ILoginResponse | undefined,
@@ -111,4 +112,83 @@ const getUpcomingEvents = async () => {
 	return events;
 };
 
-export const eventAPI = { addEvent, getUserEvents, getUpcomingEvents };
+const getEventDetails = async (eventId: number) => {
+	const detail = await axios
+		.get<IEventUserResponse>(`${baseURL}/event/${eventId}`)
+		.then((res) => res.data);
+
+	return detail;
+};
+
+const editEvent = async (
+	user: ILoginResponse | undefined,
+	eventId: string,
+	data: IEditEventForm
+) => {
+	let newDict: any = {};
+	let key: keyof typeof data;
+
+	for (key in data) {
+		if (data[key]) {
+			newDict[key] = data[key];
+		}
+	}
+
+	console.log(newDict);
+
+	if (user) {
+		const event = await axios
+			.post(`${baseURL}/event/${eventId}`, newDict, {
+				headers: {
+					Authorization: `Bearer ${user.token}`,
+				},
+			})
+			.then((res) => res.data);
+
+		return event;
+	}
+};
+
+const deleteEvent = async (
+	user: ILoginResponse | undefined,
+	eventId: number
+) => {
+	if (user) {
+		const edelete = await axios
+			.delete(`${baseURL}/event/${eventId}`, {
+				headers: {
+					Authorization: `Bearer ${user.token}`,
+				},
+			})
+			.then((res) => res.data);
+
+		return edelete;
+	}
+};
+
+const addBooking = async (
+	user: ILoginResponse | undefined,
+	data: {
+		eventId: number;
+		economyCount: number;
+		vipCount: number;
+	}
+) => {
+	const booking = await axios.post(`${baseURL}/booking/add`, data, {
+		headers: {
+			Authorization: `Bearer ${user?.token}`,
+		},
+	});
+
+	return booking;
+};
+
+export const eventAPI = {
+	addEvent,
+	editEvent,
+	deleteEvent,
+	getUserEvents,
+	getUpcomingEvents,
+	getEventDetails,
+	addBooking,
+};

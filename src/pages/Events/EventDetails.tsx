@@ -1,126 +1,281 @@
 import {
+	AlertDialog,
+	AlertDialogBody,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogOverlay,
 	Button,
-	Card,
+	ButtonGroup,
 	Flex,
 	HStack,
 	Heading,
 	Icon,
 	Img,
+	Skeleton,
+	SkeletonText,
 	Stat,
 	StatHelpText,
 	StatLabel,
 	StatNumber,
 	Text,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
-import { HiCheckBadge } from "react-icons/hi2";
+import { HiCheckBadge, HiPencil, HiTrash } from "react-icons/hi2";
 import { Footer } from "../../components/Footer";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { eventAPI } from "$lib/api/event";
+import { formatDateForUserEvent } from "$config/dayjs.config";
+import dayjs from "dayjs";
+import { useUser } from "../../state/userState";
+import { useRef } from "react";
 
 export const EventsDetailsPage = () => {
+	const { eventId } = useParams();
+	const user = useUser((state) => state.user);
+	const query = useQuery({
+		queryKey: ["eventDetails", eventId],
+		queryFn: () => eventAPI.getEventDetails(parseInt(eventId || "0")),
+	});
+	const deleteDialog = useDisclosure();
+
 	return (
 		<Flex direction="column">
 			<Navbar />
-			<Flex px="20" py="10" gap={"10"}>
-				<Flex direction={"column"} flex="1">
-					<Img
-						borderRadius={"lg"}
-						src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
-						width={"100%"}
-					/>
-				</Flex>
-				<Flex flex="2" direction={"column"}>
-					<Heading mb="4">
-						Rophnan's My Second Generations Concert
-					</Heading>
-					<Flex justifyContent={"space-between"}>
-						<Text color="blue.500" fontWeight={"bold"}>
-							Rophanan Concerts{" "}
-							<Icon fontSize={"xl"}>
-								<HiCheckBadge />
-							</Icon>
-						</Text>
-						<Flex
-							direction={"column"}
-							alignItems={"flex-end"}
-							color="blue.900"
-							fontWeight={"bold"}
-						>
-							<Text>Jan 14, 2022</Text>
-							<Text>03:00 AM</Text>
+			<Flex px="20" py="10" w="100%" gap={"10"} minH={"100vh"}>
+				{query.isLoading && (
+					<>
+						<Flex direction={"column"} flex="1">
+							<Skeleton height={"300px"} borderRadius={"lg"} />
 						</Flex>
-					</Flex>
-					<Text my="4">
-						Lorem ipsum dolor sit amet consectetur adipisicing elit.
-						Molestias officiis aliquam distinctio eum harum eveniet
-						neque, voluptatum molestiae? Illo excepturi iusto ipsum
-						commodi nemo quod nihil veritatis voluptas cum nulla.
-						Lorem ipsum dolor sit amet consectetur adipisicing elit.
-						Facilis, aut nobis fuga commodi blanditiis corporis
-						optio, sint et aliquid itaque similique vero dolore
-						dolorum nam harum vitae vel incidunt nostrum.
-					</Text>
-					<Flex as={"section"} direction={"column"} my="8">
-						<Heading size={"lg"} mb="5">
-							Packages
-						</Heading>
-						<HStack wrap={"wrap"} gap={"4"}>
-							<Stat
-								border={"1px"}
-								borderColor={"gray.200"}
+						<Flex flex="2" direction={"column"}>
+							<Skeleton height={"10"} mb="3" />
+							<Flex justifyContent={"space-between"}>
+								<SkeletonText noOfLines={1} w={"100px"} />
+								<Flex
+									direction={"column"}
+									alignItems={"flex-end"}
+									color="blue.900"
+									fontWeight={"bold"}
+									mb="2"
+								>
+									<SkeletonText
+										noOfLines={1}
+										w={"100px"}
+										mb="2"
+									/>
+									<SkeletonText noOfLines={1} w={"100px"} />
+								</Flex>
+							</Flex>
+							<SkeletonText noOfLines={5} my="4" />
+							<Flex as={"section"} direction={"column"} my="8">
+								<Skeleton height={"6"} w="200px" mb="3" />
+								<HStack wrap={"wrap"} gap={"4"}>
+									<Skeleton
+										height={"32"}
+										borderRadius={"lg"}
+										width={"200px"}
+									/>
+									<Skeleton
+										height={"32"}
+										borderRadius={"lg"}
+										width={"200px"}
+									/>
+									<Skeleton
+										height={"32"}
+										borderRadius={"lg"}
+										width={"200px"}
+									/>
+								</HStack>
+							</Flex>
+							<Flex mt="10" direction={"column"}>
+								<Skeleton height={"6"} w="200px" mb="3" />
+								<Skeleton height={"32"} borderRadius={"lg"} />
+							</Flex>
+						</Flex>
+					</>
+				)}
+				{query.data && (
+					<>
+						<Flex direction={"column"} flex="1">
+							<Img
 								borderRadius={"lg"}
-								p="3"
+								src={query.data?.galleries[0].eventPhoto}
+								width={"100%"}
+							/>
+						</Flex>
+						<Flex flex="2" direction={"column"}>
+							<Flex>
+								<Heading mb="4" flex={1}>
+									{query.data.title}
+								</Heading>
+								{user?.id == query.data.userId && (
+									<ButtonGroup>
+										<Button
+											leftIcon={
+												<Icon as={HiPencil}></Icon>
+											}
+											variant={"solid"}
+											colorScheme="blue"
+											as={Link}
+											to={`/event/edit/${query.data.id}`}
+										>
+											Edit
+										</Button>
+										<Button
+											leftIcon={<Icon as={HiTrash} />}
+											colorScheme="red"
+											variant={"ghost"}
+											onClick={deleteDialog.onOpen}
+										>
+											Delete
+										</Button>
+										<DeleteDialog
+											eventId={eventId || "0"}
+											isOpen={deleteDialog.isOpen}
+											onClose={deleteDialog.onClose}
+										/>
+									</ButtonGroup>
+								)}
+							</Flex>
+							<Flex justifyContent={"space-between"}>
+								<Text color="blue.500" fontWeight={"bold"}>
+									{query.data.company?.name}{" "}
+									<Icon fontSize={"xl"}>
+										<HiCheckBadge />
+									</Icon>
+								</Text>
+								<Flex
+									direction={"column"}
+									alignItems={"flex-end"}
+									color="blue.900"
+									fontWeight={"bold"}
+								>
+									<Text>
+										{formatDateForUserEvent(
+											query.data.eventStartTime
+										)}
+									</Text>
+									<Text>
+										{dayjs(
+											query.data.eventStartTime
+										).format("hh:mm A")}
+									</Text>
+								</Flex>
+							</Flex>
+							<Text my="4">{query.data.desc}</Text>
+							<Flex as={"section"} direction={"column"} my="8">
+								<Heading size={"lg"} mb="5">
+									Packages
+								</Heading>
+								<HStack wrap={"wrap"} gap={"4"}>
+									<Stat
+										border={"1px"}
+										borderColor={"gray.200"}
+										borderRadius={"lg"}
+										p="3"
+									>
+										<StatLabel>Economy</StatLabel>
+										<StatNumber>
+											{query.data.economyPrice} ETB
+										</StatNumber>
+										<StatHelpText>
+											{query.data.economySeats} Seats
+											Available
+										</StatHelpText>
+									</Stat>
+									{query.data.vipSeats && (
+										<Stat
+											border={"1px"}
+											borderColor={"gray.200"}
+											borderRadius={"lg"}
+											p="3"
+										>
+											<StatLabel>VIP</StatLabel>
+											<StatNumber>
+												{query.data.vipPrice} ETB
+											</StatNumber>
+											<StatHelpText>
+												{query.data.vipSeats} Seats
+												Available
+											</StatHelpText>
+										</Stat>
+									)}
+								</HStack>
+							</Flex>
+							<Flex mt="10" direction={"column"}>
+								<Heading size={"lg"} mb="3">
+									Location
+								</Heading>
+								{query.data.locations &&
+									query.data.locations[0] && (
+										<img
+											src={`http://maps.googleapis.com/maps/api/staticmap?center=${query.data.locations[0].longitude},${query.data.locations[0].latitude}&zoom=11&size=200x200&sensor=false`}
+										></img>
+									)}
+							</Flex>
+							<Button
+								as={NavLink}
+								to={`/reserve/${query.data.id}`}
+								my="20"
+								background={"blue.900"}
+								colorScheme="blue"
 							>
-								<StatLabel>Normal</StatLabel>
-								<StatNumber>300 ETB</StatNumber>
-								<StatHelpText>100 Seats Available</StatHelpText>
-							</Stat>
-							<Stat
-								border={"1px"}
-								borderColor={"gray.200"}
-								borderRadius={"lg"}
-								p="3"
-							>
-								<StatLabel>VIP</StatLabel>
-								<StatNumber>500 ETB</StatNumber>
-								<StatHelpText>100 Seats Available</StatHelpText>
-							</Stat>
-							<Stat
-								border={"1px"}
-								borderColor={"gray.200"}
-								borderRadius={"lg"}
-								p="3"
-							>
-								<StatLabel>VVIP</StatLabel>
-								<StatNumber>800 ETB</StatNumber>
-								<StatHelpText>100 Seats Available</StatHelpText>
-							</Stat>
-						</HStack>
-					</Flex>
-					<Flex mt="10" direction={"column"}>
-						<Heading size={"lg"} mb="3">
-							Location
-						</Heading>
-						<iframe
-							src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.559483514531!2d38.753567624377354!3d9.012618391048086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b85bf02f0f01f%3A0x139feaf0e87089eb!2sGhion%20Hotel%20%7C%20Stadium!5e0!3m2!1sen!2sus!4v1684068754540!5m2!1sen!2sus"
-							width="100%"
-							height="300"
-							loading="lazy"
-							referrerPolicy="no-referrer-when-downgrade"
-						></iframe>
-					</Flex>
-					<Button
-						as={NavLink}
-						to={"/reserve/123"}
-						my="20"
-						background={"blue.900"}
-						colorScheme="blue"
-					>
-						Reserve
-					</Button>
-				</Flex>
+								Reserve
+							</Button>
+						</Flex>
+					</>
+				)}
 			</Flex>
 			<Footer />
 		</Flex>
+	);
+};
+
+interface DialogProps {
+	eventId: string;
+	isOpen: boolean;
+	onClose: () => void;
+}
+const DeleteDialog = ({ eventId, isOpen, onClose }: DialogProps) => {
+	const btnProp = useRef(null);
+	const user = useUser((state) => state.user);
+	const navigate = useNavigate();
+	const mutation = useMutation({
+		mutationKey: ["deleteEvent", eventId],
+		mutationFn: () => eventAPI.deleteEvent(user, parseInt(eventId)),
+		onSuccess: () => {
+			navigate(-1);
+		},
+	});
+	return (
+		<AlertDialog
+			leastDestructiveRef={btnProp}
+			onClose={onClose}
+			isOpen={isOpen}
+		>
+			<AlertDialogOverlay />
+			<AlertDialogContent>
+				<AlertDialogHeader>Delete Event</AlertDialogHeader>
+				<AlertDialogBody>
+					Are you sure delete this event?
+				</AlertDialogBody>
+				<AlertDialogFooter>
+					<ButtonGroup>
+						<Button
+							colorScheme="red"
+							ref={btnProp}
+							isLoading={mutation.isLoading}
+							onClick={() => mutation.mutate()}
+						>
+							Delete
+						</Button>
+						<Button onClick={onClose}>Close</Button>
+					</ButtonGroup>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 };

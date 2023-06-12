@@ -17,7 +17,7 @@ export interface IProfileResponse {
 const getProfile = async (user: ILoginResponse | undefined) => {
 	if (user) {
 		const profile = await axios
-			.get<IProfileResponse>(`${baseURL}/profile/${user.userId}`, {
+			.get<IProfileResponse>(`${baseURL}/profile/${user.id}`, {
 				headers: {
 					authorization: `Bearer ${user.token}`,
 				},

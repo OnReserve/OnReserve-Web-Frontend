@@ -15,6 +15,7 @@ export interface ILoginResponse {
 	fname: string;
 	lname: string;
 	email: string;
+	role: "USER" | "SUPERADMIN";
 	createdAt: Date | null;
 	updatedAt: Date | null;
 }

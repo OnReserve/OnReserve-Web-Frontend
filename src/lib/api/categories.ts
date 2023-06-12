@@ -9,18 +9,12 @@ interface ICategoryResponse {
 	updatedAt: string;
 }
 
-export const getCategories = async (user: ILoginResponse | undefined) => {
-	if (user) {
-		const categories = await axios
-			.get<ICategoryResponse[]>(`${baseURL}/categories`, {
-				headers: {
-					Authorization: `Bearer ${user.token}`,
-				},
-			})
-			.then((res) => res.data);
+export const getCategories = async () => {
+	const categories = await axios
+		.get<ICategoryResponse[]>(`${baseURL}/categories`)
+		.then((res) => res.data);
 
-		return categories;
-	}
+	return categories;
 };
 
 export const categoryAPI = { getCategories };

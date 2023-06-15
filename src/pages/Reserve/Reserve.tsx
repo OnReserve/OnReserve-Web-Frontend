@@ -20,11 +20,11 @@ import {
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
 import { HiCheckBadge, HiPlus, HiTrash, HiXCircle } from "react-icons/hi2";
-import { NavLink, useParams } from "react-router-dom";
+import { redirect, useNavigate, useParams } from "react-router-dom";
 import { Footer } from "../../components/Footer";
 import { useReservation } from "../../state/reservationState";
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
@@ -34,6 +34,7 @@ export const ReservationPage = () => {
 	const { eventId } = useParams();
 	const user = useUser((state) => state.user);
 	const clear = useReservation((state) => state.clear);
+	const navigate = useNavigate();
 	const [total, setTotal] = useState(0);
 	const packages = useReservation((state) => state.packages);
 	let query = useQuery({
@@ -68,12 +69,23 @@ export const ReservationPage = () => {
 	}, [eventId]);
 
 	const handlePayment = () => {
-		bookingMutation.mutate({
-			eventId: parseInt(eventId || "0"),
-			economyCount: packages.filter((_package) => _package === "NORMAL")
-				.length,
-			vipCount: packages.filter((_package) => _package === "VIP").length,
-		});
+		bookingMutation.mutate(
+			{
+				eventId: parseInt(eventId || "0"),
+				economyCount: packages.filter(
+					(_package) => _package === "NORMAL"
+				).length,
+				vipCount: packages.filter((_package) => _package === "VIP")
+					.length,
+			},
+			{
+				onSuccess: (data, variables, context) => {
+					window.location.assign(
+						`https://yenepay.com/checkout/Home/Process/?ItemName=Booking-Ticket-For-Event-${variables.eventId}&ItemId=${data.bookingToken}&UnitPrice=${total}&Quantity=1&Process=Express&ExpiresAfter=&DeliveryFee=&HandlingFee=&Tax1=&Tax2=&Discount=&SuccessUrl=&IPNUrl=&MerchantId=26459`
+					);
+				},
+			}
+		);
 	};
 
 	return (
@@ -149,6 +161,7 @@ export const ReservationPage = () => {
 										background={"blue.900"}
 										colorScheme="blue"
 										onClick={() => handlePayment()}
+										isLoading={bookingMutation.isLoading}
 									>
 										Continue to Payment
 									</Button>

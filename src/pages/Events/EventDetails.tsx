@@ -26,11 +26,12 @@ import { HiCheckBadge, HiPencil, HiTrash } from "react-icons/hi2";
 import { Footer } from "../../components/Footer";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { eventAPI } from "$lib/api/event";
+import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
 import { useUser } from "../../state/userState";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { Gallery } from "$lib/api/event";
 
 export const EventsDetailsPage = () => {
 	const { eventId } = useParams();
@@ -44,7 +45,14 @@ export const EventsDetailsPage = () => {
 	return (
 		<Flex direction="column">
 			<Navbar />
-			<Flex px="20" py="10" w="100%" gap={"10"} minH={"100vh"}>
+			<Flex
+				px="20"
+				py="10"
+				w="100%"
+				gap={"10"}
+				minH={"100vh"}
+				direction={"column"}
+			>
 				{query.isLoading && (
 					<>
 						<Flex direction={"column"} flex="1">
@@ -99,137 +107,168 @@ export const EventsDetailsPage = () => {
 				)}
 				{query.data && (
 					<>
-						<Flex direction={"column"} flex="1">
-							<Img
-								borderRadius={"lg"}
-								src={query.data?.galleries[0].eventPhoto}
-								width={"100%"}
-							/>
-						</Flex>
-						<Flex flex="2" direction={"column"}>
-							<Flex>
-								<Heading mb="4" flex={1}>
-									{query.data.title}
-								</Heading>
-								{user?.id == query.data.userId && (
-									<ButtonGroup>
-										<Button
-											leftIcon={
-												<Icon as={HiPencil}></Icon>
-											}
-											variant={"solid"}
-											colorScheme="blue"
-											as={Link}
-											to={`/event/edit/${query.data.id}`}
-										>
-											Edit
-										</Button>
-										<Button
-											leftIcon={<Icon as={HiTrash} />}
-											colorScheme="red"
-											variant={"ghost"}
-											onClick={deleteDialog.onOpen}
-										>
-											Delete
-										</Button>
-										<DeleteDialog
-											eventId={eventId || "0"}
-											isOpen={deleteDialog.isOpen}
-											onClose={deleteDialog.onClose}
-										/>
-									</ButtonGroup>
-								)}
-							</Flex>
-							<Flex justifyContent={"space-between"}>
-								<Text color="blue.500" fontWeight={"bold"}>
-									{query.data.company?.name}{" "}
-									<Icon fontSize={"xl"}>
-										<HiCheckBadge />
-									</Icon>
-								</Text>
-								<Flex
-									direction={"column"}
-									alignItems={"flex-end"}
-									color="blue.900"
-									fontWeight={"bold"}
-								>
-									<Text>
-										{formatDateForUserEvent(
-											query.data.eventStartTime
-										)}
-									</Text>
-									<Text>
-										{dayjs(
-											query.data.eventStartTime
-										).format("hh:mm A")}
-									</Text>
+						{query.data.galleries &&
+							query.data.galleries.length > 0 && (
+								<ImageGallery gallery={query.data.galleries} />
+							)}
+						<Flex>
+							<Flex flex="2" direction={"column"}>
+								<Flex>
+									<Heading mb="4" flex={1}>
+										{query.data.title}
+									</Heading>
+									{user?.id == query.data.userId && (
+										<ButtonGroup>
+											<Button
+												leftIcon={
+													<Icon as={HiPencil}></Icon>
+												}
+												variant={"solid"}
+												colorScheme="blue"
+												as={Link}
+												to={`/event/edit/${query.data.id}`}
+											>
+												Edit
+											</Button>
+											<Button
+												leftIcon={<Icon as={HiTrash} />}
+												colorScheme="red"
+												variant={"ghost"}
+												onClick={deleteDialog.onOpen}
+											>
+												Delete
+											</Button>
+											<DeleteDialog
+												eventId={eventId || "0"}
+												isOpen={deleteDialog.isOpen}
+												onClose={deleteDialog.onClose}
+											/>
+										</ButtonGroup>
+									)}
 								</Flex>
-							</Flex>
-							<Text my="4">{query.data.desc}</Text>
-							<Flex as={"section"} direction={"column"} my="8">
-								<Heading size={"lg"} mb="5">
-									Packages
-								</Heading>
-								<HStack wrap={"wrap"} gap={"4"}>
-									<Stat
-										border={"1px"}
-										borderColor={"gray.200"}
-										borderRadius={"lg"}
-										p="3"
+								<Flex justifyContent={"space-between"}>
+									<Text color="blue.500" fontWeight={"bold"}>
+										{query.data.company?.name}{" "}
+										<Icon fontSize={"xl"}>
+											<HiCheckBadge />
+										</Icon>
+									</Text>
+									<Flex
+										direction={"column"}
+										alignItems={"flex-end"}
+										color="blue.900"
+										fontWeight={"bold"}
 									>
-										<StatLabel>Economy</StatLabel>
-										<StatNumber>
-											{query.data.economyPrice} ETB
-										</StatNumber>
-										<StatHelpText>
-											{query.data.economySeats} Seats
-											Available
-										</StatHelpText>
-									</Stat>
-									{query.data.vipSeats && (
+										<Text>
+											{formatDateForUserEvent(
+												query.data.eventStartTime
+											)}
+										</Text>
+										<Text>
+											{dayjs(
+												query.data.eventStartTime
+											).format("hh:mm A")}
+										</Text>
+									</Flex>
+								</Flex>
+								<Text my="4">{query.data.desc}</Text>
+								<Flex
+									as={"section"}
+									direction={"column"}
+									my="8"
+								>
+									<Heading size={"lg"} mb="5">
+										Packages
+									</Heading>
+									<HStack wrap={"wrap"} gap={"4"}>
 										<Stat
 											border={"1px"}
 											borderColor={"gray.200"}
 											borderRadius={"lg"}
 											p="3"
 										>
-											<StatLabel>VIP</StatLabel>
+											<StatLabel>Economy</StatLabel>
 											<StatNumber>
-												{query.data.vipPrice} ETB
+												{query.data.economyPrice} ETB
 											</StatNumber>
 											<StatHelpText>
-												{query.data.vipSeats} Seats
+												{query.data.economySeats} Seats
 												Available
 											</StatHelpText>
 										</Stat>
-									)}
-								</HStack>
+										{query.data.vipSeats && (
+											<Stat
+												border={"1px"}
+												borderColor={"gray.200"}
+												borderRadius={"lg"}
+												p="3"
+											>
+												<StatLabel>VIP</StatLabel>
+												<StatNumber>
+													{query.data.vipPrice} ETB
+												</StatNumber>
+												<StatHelpText>
+													{query.data.vipSeats} Seats
+													Available
+												</StatHelpText>
+											</Stat>
+										)}
+									</HStack>
+								</Flex>
+								<Flex mt="10" direction={"column"}>
+									<Heading size={"lg"} mb="3">
+										Location
+									</Heading>
+									{query.data.locations &&
+										query.data.locations[0] && (
+											<img
+												src={`http://maps.googleapis.com/maps/api/staticmap?center=${query.data.locations[0].longitude},${query.data.locations[0].latitude}&zoom=11&size=200x200&sensor=false`}
+											></img>
+										)}
+								</Flex>
+								<Button
+									as={NavLink}
+									to={`/reserve/${query.data.id}`}
+									my="20"
+									background={"blue.900"}
+									colorScheme="blue"
+								>
+									Reserve
+								</Button>
 							</Flex>
-							<Flex mt="10" direction={"column"}>
-								<Heading size={"lg"} mb="3">
-									Location
-								</Heading>
-								{query.data.locations &&
-									query.data.locations[0] && (
-										<img
-											src={`http://maps.googleapis.com/maps/api/staticmap?center=${query.data.locations[0].longitude},${query.data.locations[0].latitude}&zoom=11&size=200x200&sensor=false`}
-										></img>
-									)}
-							</Flex>
-							<Button
-								as={NavLink}
-								to={`/reserve/${query.data.id}`}
-								my="20"
-								background={"blue.900"}
-								colorScheme="blue"
-							>
-								Reserve
-							</Button>
+							<Flex flex={"1"}></Flex>
 						</Flex>
 					</>
 				)}
 			</Flex>
 			<Footer />
+		</Flex>
+	);
+};
+
+const ImageGallery = ({ gallery }: { gallery: Gallery[] }) => {
+	const [selected, setSelected] = useState("");
+	return (
+		<Flex direction={"column"} flex="1">
+			<Img
+				borderRadius={"lg"}
+				src={selected ? selected : gallery[0].eventPhoto}
+				width={"100%"}
+				maxHeight={"300px"}
+				objectFit={"cover"}
+			/>
+			<Flex gap={"5"} my="5" direction={"row"} wrap={"wrap"}>
+				{gallery.map((_img) => (
+					<Img
+						key={_img.id}
+						onClick={() => setSelected(_img.eventPhoto)}
+						borderRadius={"md"}
+						src={_img.eventPhoto}
+						height={"100px"}
+						objectFit={"cover"}
+					/>
+				))}
+			</Flex>
 		</Flex>
 	);
 };
@@ -277,5 +316,13 @@ const DeleteDialog = ({ eventId, isOpen, onClose }: DialogProps) => {
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
+	);
+};
+
+const EventReviews = () => {
+	return (
+		<Flex direction={"column"}>
+			<Heading fontSize={"2xl"}>Reviews</Heading>
+		</Flex>
 	);
 };

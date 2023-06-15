@@ -284,7 +284,7 @@ const EventCard = ({ event }: { event: IEventUserResponse }) => {
 				mr={"5"}
 				width={"40"}
 				height={"40"}
-				objectFit={"fill"}
+				objectFit={"cover"}
 				src={event.galleries[0].eventPhoto}
 				borderRadius={"md"}
 			></Img>

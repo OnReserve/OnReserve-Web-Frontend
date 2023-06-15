@@ -356,7 +356,7 @@ const AddCompanyDialog = ({ isOpen, onClose }: IAddCompanyModal) => {
 									alignItems={"center"}
 									justifyContent={"center"}
 									color={"white"}
-									opacity={formik.values.profilePic ? 0 : 1}
+									opacity={0}
 									background={"blackAlpha.600"}
 									borderRadius={"full"}
 									position={"absolute"}
@@ -374,12 +374,14 @@ const AddCompanyDialog = ({ isOpen, onClose }: IAddCompanyModal) => {
 								<Avatar
 									border={"4px solid white"}
 									size={"2xl"}
+									name={formik.values.name}
+									background="purple.600"
 									src={
 										formik.values.profilePic
 											? URL.createObjectURL(
 													formik.values.profilePic
 											  )
-											: "https://api.dicebear.com/6.x/initials/svg?seed=c"
+											: ""
 									}
 								/>
 								<Input
@@ -423,7 +425,7 @@ const AddCompanyDialog = ({ isOpen, onClose }: IAddCompanyModal) => {
 						<Button
 							colorScheme="blue"
 							onClick={(e: any) => formik.handleSubmit(e)}
-							isLoading={formik.isSubmitting}
+							isLoading={mutation.isLoading}
 						>
 							Create Company
 						</Button>

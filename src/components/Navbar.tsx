@@ -55,8 +55,15 @@ export const Navbar = () => {
 						<MenuItem>Camping</MenuItem>
 					</MenuList>
 				</Menu>
-				<Button>Ticket</Button>
+				<Button as={NavLink} to={"/tickets"}>
+					Ticket
+				</Button>
 				<Button>My Events</Button>
+				{user && user?.role === "SUPERADMIN" && (
+					<Button as={NavLink} to={"/admin"}>
+						Admin
+					</Button>
+				)}
 			</ButtonGroup>
 			<Flex>
 				<FormControl>

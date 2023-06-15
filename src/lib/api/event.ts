@@ -174,11 +174,13 @@ const addBooking = async (
 		vipCount: number;
 	}
 ) => {
-	const booking = await axios.post(`${baseURL}/booking/add`, data, {
-		headers: {
-			Authorization: `Bearer ${user?.token}`,
-		},
-	});
+	const booking = await axios
+		.post(`${baseURL}/booking/add`, data, {
+			headers: {
+				Authorization: `Bearer ${user?.token}`,
+			},
+		})
+		.then((res) => res.data);
 
 	return booking;
 };

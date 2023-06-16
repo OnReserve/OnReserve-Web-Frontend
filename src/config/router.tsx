@@ -16,6 +16,7 @@ import { AdminsList } from "$pages/Admin/admins";
 import { AdminBookingPage } from "$pages/Admin/AdminBookings";
 import { BookingPage } from "$pages/Booking/BookingsList";
 import { AdminCategories } from "$pages/Admin/AdminCategories";
+import { BookingDetails } from "$pages/Booking/BookingDetails";
 
 const routerConfig = createBrowserRouter([
 	{
@@ -61,6 +62,10 @@ const routerConfig = createBrowserRouter([
 	{
 		path: "/tickets",
 		element: <BookingPage />,
+	},
+	{
+		path: "/ticket/:id",
+		element: <BookingDetails />,
 	},
 	{
 		path: "/admin",

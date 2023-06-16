@@ -5,6 +5,7 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogOverlay,
+	Avatar,
 	Button,
 	ButtonGroup,
 	Flex,
@@ -19,19 +20,28 @@ import {
 	StatLabel,
 	StatNumber,
 	Text,
+	Textarea,
 	useDisclosure,
+	useToast,
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
-import { HiCheckBadge, HiPencil, HiTrash } from "react-icons/hi2";
+import {
+	HiCheckBadge,
+	HiOutlineStar,
+	HiPencil,
+	HiStar,
+	HiTrash,
+} from "react-icons/hi2";
 import { Footer } from "../../components/Footer";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
 import { useUser } from "../../state/userState";
 import { useRef, useState } from "react";
 import { Gallery } from "$lib/api/event";
+import { IReviewRequest, reviewAPI } from "$lib/api/review";
 
 export const EventsDetailsPage = () => {
 	const { eventId } = useParams();
@@ -236,7 +246,7 @@ export const EventsDetailsPage = () => {
 									Reserve
 								</Button>
 							</Flex>
-							<Flex flex={"1"}></Flex>
+							<EventReviews />
 						</Flex>
 					</>
 				)}
@@ -321,8 +331,162 @@ const DeleteDialog = ({ eventId, isOpen, onClose }: DialogProps) => {
 
 const EventReviews = () => {
 	return (
+		<Flex direction={"column"} ml="10" flex="1">
+			<Heading fontSize={"2xl"} mb="5">
+				Reviews
+			</Heading>
+			<Flex mb="10" direction={"column"}>
+				<AddReview />
+			</Flex>
+			<ReviewsList />
+		</Flex>
+	);
+};
+
+const AddReview = () => {
+	const [rating, setRating] = useState(0);
+	const [finalRating, setFinalRating] = useState(0);
+	const [comment, setComment] = useState("");
+	const { eventId } = useParams();
+	const user = useUser((state) => state.user);
+	const toast = useToast();
+	const queryClient = useQueryClient();
+
+	const mutation = useMutation({
+		mutationKey: ["addReview"],
+		mutationFn: (data: IReviewRequest) =>
+			reviewAPI.addReview(user, parseInt(eventId || "0"), data),
+		onSuccess: () => {
+			toast({
+				status: "success",
+				title: "Review Added",
+				description: "Thank you for you contribution",
+				position: "bottom-right",
+			});
+			queryClient.invalidateQueries(["loadReviews"]);
+			setComment("");
+		},
+		onError: (error) => {
+			toast({
+				status: "error",
+				title: "We have failed to post your Review",
+				description: "Please, try again",
+				position: "bottom-right",
+			});
+		},
+	});
+	return (
+		<Flex
+			direction={"column"}
+			alignItems={"center"}
+			border={"1px solid #eee"}
+			borderRadius={"md"}
+			padding={"5"}
+		>
+			<Text mb="3" color={"gray.800"} fontWeight={"bold"}>
+				Rate this event
+			</Text>
+
+			<HStack onMouseLeave={() => setRating(finalRating)}>
+				{[...Array(5)].map((_v, _i) => (
+					<Icon
+						onClick={() => setFinalRating(_i + 1)}
+						onMouseOver={() => setRating(_i + 1)}
+						as={
+							rating >= _i + 1 || finalRating >= _i + 1
+								? HiStar
+								: HiOutlineStar
+						}
+						color={
+							finalRating >= _i + 1 ? "orange.400" : "gray.400"
+						}
+						boxSize={"8"}
+					/>
+				))}
+			</HStack>
+
+			<Textarea
+				value={comment}
+				onChange={(e) => setComment(e.target.value)}
+				mt="7"
+				size={"sm"}
+				placeholder="Give your Review"
+				rows={5}
+			></Textarea>
+
+			<Button
+				colorScheme="blue"
+				mt="10"
+				alignSelf={"stretch"}
+				size="sm"
+				isLoading={mutation.isLoading}
+				onClick={() =>
+					mutation.mutate({ comment, rating: finalRating })
+				}
+			>
+				Post a Review
+			</Button>
+		</Flex>
+	);
+};
+
+const ReviewsList = () => {
+	const { eventId } = useParams();
+	const reviewQuery = useQuery({
+		queryKey: ["loadReviews"],
+		queryFn: () => reviewAPI.getReviews(parseInt(eventId || "0")),
+	});
+
+	if (reviewQuery.isLoading) {
+		return (
+			<Flex direction={"column"} gap="2">
+				{[...Array(4)].map((_v, _i) => (
+					<Skeleton key={_i} height={"100"} borderRadius={"md"} />
+				))}
+			</Flex>
+		);
+	}
+
+	return (
 		<Flex direction={"column"}>
-			<Heading fontSize={"2xl"}>Reviews</Heading>
+			{reviewQuery.data &&
+				reviewQuery.data.reviews.map((review, index) => (
+					<Flex
+						direction={"column"}
+						p="4"
+						border={"1px solid #eee"}
+						mb="4"
+					>
+						<Flex alignItems={"center"}>
+							<Avatar
+								mr="4"
+								name={`${review.user.fname} ${review.user.lname}`}
+								src={review.user.profile.profilePic}
+							/>
+							<Flex direction={"column"}>
+								<Heading
+									fontSize={"md"}
+									mb={"1"}
+								>{`${review.user.fname} ${review.user.lname}`}</Heading>
+								<Flex>
+									{[...Array(5)].map((_v, _i) => (
+										<Icon
+											as={
+												review.stars >= _i + 1
+													? HiStar
+													: HiOutlineStar
+											}
+											color={"orange.400"}
+										/>
+									))}
+								</Flex>
+							</Flex>
+						</Flex>
+						<Flex mt="3">
+							<Text>{review.comment}</Text>
+						</Flex>
+					</Flex>
+				))}
 		</Flex>
 	);
 };

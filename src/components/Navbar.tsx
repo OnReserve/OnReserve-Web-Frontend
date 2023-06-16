@@ -30,6 +30,7 @@ export const Navbar = () => {
 
 	return (
 		<Flex
+			background={"white"}
 			color="blue.900"
 			px="20"
 			py="10"

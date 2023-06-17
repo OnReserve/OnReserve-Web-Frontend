@@ -27,11 +27,14 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../../state/userState";
 import { adminAPI } from "$lib/api/admin";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
 export const AdminBookingPage = () => {
 	const [token, setToken] = useState("");
+	const confirmDialog = useDisclosure();
+	const [bookingId, setBookingID] = useState(0);
+
 	return (
 		<Flex
 			flex={"4"}
@@ -42,6 +45,11 @@ export const AdminBookingPage = () => {
 			p="10"
 			ml="10"
 		>
+			<ConfirmDialog
+				id={bookingId}
+				isOpen={confirmDialog.isOpen}
+				onClose={confirmDialog.onClose}
+			/>
 			<Flex justifyContent={"space-between"} mb="5">
 				<Heading fontSize={"2xl"}>Booked Tickets</Heading>
 				<InputGroup justifySelf={"flex-end"} width={"300px"}>
@@ -66,18 +74,27 @@ export const AdminBookingPage = () => {
 							<Th>Actions</Th>
 						</Tr>
 					</Thead>
-					<BookingsList filterToken={token} />
+					<BookingsList
+						onOpen={confirmDialog.onOpen}
+						setID={setBookingID}
+						filterToken={token}
+					/>
 				</Table>
 			</Flex>
 		</Flex>
 	);
 };
 
-const BookingsList = ({ filterToken }: { filterToken: string }) => {
-	const confirmDialog = useDisclosure();
+const BookingsList = ({
+	filterToken,
+	setID,
+	onOpen,
+}: {
+	filterToken: string;
+	setID: Dispatch<SetStateAction<number>>;
+	onOpen: () => void;
+}) => {
 	const user = useUser((state) => state.user);
-	const queryClient = useQueryClient();
-	const toast = useToast();
 	const query = useQuery({
 		queryKey: ["loadBookings"],
 		queryFn: () => adminAPI.loadBookings(user),
@@ -117,16 +134,14 @@ const BookingsList = ({ filterToken }: { filterToken: string }) => {
 							<Td>{_booking.bookingToken}</Td>
 							<Td>{_booking.price}</Td>
 							<Td>
-								<ConfirmDialog
-									id={_booking.id}
-									isOpen={confirmDialog.isOpen}
-									onClose={confirmDialog.onClose}
-								/>
 								<Button
 									colorScheme="green"
 									variant={"ghost"}
 									size="sm"
-									onClick={confirmDialog.onOpen}
+									onClick={() => {
+										setID(_booking.id);
+										onOpen();
+									}}
 								>
 									Approve
 								</Button>

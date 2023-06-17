@@ -10,6 +10,7 @@ export interface ILoginResponse {
 	token: string;
 	phoneNumber: string | null;
 	profilePic: string | null;
+	coverPic: string | null;
 	bio: string | null;
 	id: number;
 	fname: string;

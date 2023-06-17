@@ -44,6 +44,7 @@ import { useFormik } from "formik";
 import { AuthGuard } from "../../components/AuthGuard";
 import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
+import { EditProfileDialog } from "./EditProfile";
 
 export const ProfileViewPage = () => {
 	return (
@@ -75,6 +76,7 @@ export const ProfileViewPage = () => {
 
 const ProfileCard = () => {
 	const user = useUser((state) => state.user);
+	const dialog = useDisclosure();
 
 	return (
 		<Flex
@@ -85,13 +87,20 @@ const ProfileCard = () => {
 			background="white"
 			position={"relative"}
 		>
+			<EditProfileDialog
+				isOpen={dialog.isOpen}
+				onClose={dialog.onClose}
+			/>
 			<Box position={"relative"} mb="10">
 				<Img
 					borderTopRadius={"xl"}
 					width={"full"}
 					height={"40"}
 					objectFit={"cover"}
-					src="https://images.unsplash.com/photo-1501612780327-45045538702b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80"
+					src={
+						user?.coverPic ||
+						"https://images.unsplash.com/photo-1501612780327-45045538702b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80"
+					}
 				></Img>
 				<Avatar
 					size={"2xl"}
@@ -112,8 +121,7 @@ const ProfileCard = () => {
 						<Text fontSize={"sm"}>{user?.email}</Text>
 					</Flex>
 					<IconButton
-						as={Link}
-						to="/profile/edit"
+						onClick={dialog.onOpen}
 						aria-label="Edit Profile"
 						variant={"ghost"}
 						colorScheme={"blue"}

@@ -49,7 +49,7 @@ export const BookingPage = () => {
 const ListOfBookings = () => {
 	const user = useUser((state) => state.user);
 	const query = useQuery({
-		queryKey: ["loadBookings"],
+		queryKey: ["loadUserBookings"],
 		queryFn: () => bookingAPI.getBookings(user),
 	});
 
@@ -90,10 +90,10 @@ const ListOfBookings = () => {
 						}}
 					>
 						<Heading fontSize={"lg"} mb="1">
-							{_ticket.event.title}
+							{_ticket?.event?.title}
 						</Heading>
 						<Text fontSize={"sm"} color={"gray.500"}>
-							{getFromNow(_ticket.createdAt)}
+							{getFromNow(_ticket?.createdAt)}
 							<Badge
 								ml="4"
 								colorScheme={
@@ -117,8 +117,8 @@ const ListOfBookings = () => {
 								color={"gray.800"}
 							>
 								{_ticket.economyCount *
-									_ticket.event.economyPrice +
-									_ticket.vipCount * _ticket.event.vipPrice}
+									_ticket.event?.economyPrice +
+									_ticket.vipCount * _ticket?.event?.vipPrice}
 								ETB
 							</Text>
 						</Flex>

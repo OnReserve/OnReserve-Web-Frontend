@@ -28,4 +28,37 @@ const getProfile = async (user: ILoginResponse | undefined) => {
 	}
 };
 
-export const profileAPI = { getProfile };
+export interface IEditProfile {
+	fname: string;
+	lname: string;
+	phoneNumber: string;
+	bio: string;
+	profilePic: any;
+	coverPic: any;
+}
+
+const editProfile = async (
+	user: ILoginResponse | undefined,
+	data: IEditProfile
+) => {
+	if (user) {
+		const formdata = new FormData();
+		let key: keyof typeof data;
+
+		for (key in data) {
+			formdata.append(key, data[key]);
+		}
+
+		const updatedUser = await axios
+			.post(`${baseURL}/profile/${user.id}`, formdata, {
+				headers: {
+					Authorization: `Bearer ${user.token}`,
+				},
+			})
+			.then((res) => res.data);
+
+		return updatedUser;
+	}
+};
+
+export const profileAPI = { getProfile, editProfile };

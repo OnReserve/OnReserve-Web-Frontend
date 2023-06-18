@@ -1,39 +1,29 @@
 import {
-	Button,
-	ButtonGroup,
 	Flex,
-	FormControl,
 	Heading,
 	Icon,
 	IconButton,
 	Img,
-	Input,
-	InputGroup,
-	InputLeftElement,
-	Link,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuList,
 	SimpleGrid,
+	Skeleton,
 	Text,
-	VStack,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import {
 	HiArrowRight,
-	HiChevronDown,
-	HiGlobeAsiaAustralia,
 	HiKey,
-	HiMagnifyingGlass,
-	HiMusicalNote,
+	HiRectangleStack,
 	HiRocketLaunch,
 	HiSun,
-	HiVideoCamera,
 } from "react-icons/hi2";
-import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
+import { useQuery } from "@tanstack/react-query";
+import { eventAPI } from "$lib/api/event";
+import dayjs from "dayjs";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useCategories } from "$lib/hooks/useCategories";
+import { useFilter } from "../../state/filterState";
 
 export const LandingPage = () => {
 	return (
@@ -49,36 +39,6 @@ export const LandingPage = () => {
 };
 
 const PopularSection = () => {
-	const popular: IPopularListCard[] = [
-		{
-			title: "Rophnan at Hawasa",
-			type: "Concert",
-			bgUrl: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80",
-			date: 20,
-			month: "jan",
-		},
-		{
-			title: "Rophnan at Hawasa",
-			type: "Concert",
-			bgUrl: "https://images.unsplash.com/photo-1509824227185-9c5a01ceba0d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80",
-			date: 20,
-			month: "jan",
-		},
-		{
-			title: "Rophnan at Hawasa",
-			type: "Concert",
-			bgUrl: "https://images.unsplash.com/photo-1583795484071-3c453e3a7c71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=871&q=80",
-			date: 20,
-			month: "jan",
-		},
-		{
-			title: "Rophnan at Hawasa",
-			type: "Concert",
-			bgUrl: "https://images.unsplash.com/photo-1509824227185-9c5a01ceba0d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=415&q=80",
-			date: 20,
-			month: "jan",
-		},
-	];
 	return (
 		<Flex direction={"column"} px="32" mt="5">
 			<Heading fontSize={"2xl"} mb="5" color={"gray.700"}>
@@ -96,15 +56,58 @@ const PopularSection = () => {
 					},
 				}}
 			>
-				{popular.map((p) => (
-					<PopularListCard {...p} key={p.title} />
-				))}
+				<PopularList />
 			</Flex>
 		</Flex>
 	);
 };
 
+const PopularList = () => {
+	const popular = useQuery({
+		queryKey: ["popularEvents"],
+		queryFn: () => eventAPI.getEvents({ type: "popular" }),
+	});
+
+	if (popular.isLoading) {
+		return (
+			<>
+				{[...Array(5)].map((_v, _i) => (
+					<Skeleton
+						key={_i}
+						scrollSnapAlign={"start"}
+						position={"relative"}
+						minWidth={"300px"}
+						height={"200px"}
+						p={"6"}
+						backgroundSize={"cover"}
+						borderRadius={"2xl"}
+						justifyContent={"flex-end"}
+					></Skeleton>
+				))}
+			</>
+		);
+	}
+
+	return (
+		<>
+			{popular.data &&
+				popular.data.map((_event) => (
+					<PopularListCard
+						key={_event.id}
+						id={_event.id}
+						bgUrl={_event.galleries[0].eventPhoto}
+						title={_event.title}
+						type={_event.company?.name || ""}
+						date={dayjs(_event.eventStartTime).date()}
+						month={dayjs(_event.eventStartTime).format("MMM")}
+					/>
+				))}
+		</>
+	);
+};
+
 interface IPopularListCard {
+	id: number;
 	title: string;
 	type: string;
 	bgUrl: string;
@@ -113,6 +116,7 @@ interface IPopularListCard {
 }
 
 const PopularListCard = ({
+	id,
 	title,
 	type,
 	bgUrl,
@@ -121,6 +125,8 @@ const PopularListCard = ({
 }: IPopularListCard) => {
 	return (
 		<Flex
+			as={NavLink}
+			to={`/events/${id}`}
 			scrollSnapAlign={"start"}
 			direction={"column"}
 			position={"relative"}
@@ -158,56 +164,53 @@ const PopularListCard = ({
 };
 
 const CategorySection = () => {
+	const categories = useCategories();
 	return (
 		<Flex direction={"column"} px="32" my="20">
 			<Heading fontSize={"2xl"} mb="5" color={"gray.700"}>
 				Category
 			</Heading>
 			<SimpleGrid columns={[2, 2, 3]} gap={"5"}>
-				<CategoryCard
-					icon={<HiVideoCamera size="30px" />}
-					name="Movies"
-					amount={10}
-				/>
-				<CategoryCard
-					icon={<HiMusicalNote size="30px" />}
-					name="Concert"
-					amount={20}
-				/>
-				<CategoryCard
-					icon={<HiGlobeAsiaAustralia size="30px" />}
-					name="Trips"
-					amount={10}
-				/>
-				<CategoryCard
-					icon={<HiVideoCamera size="30px" />}
-					name="Movies"
-					amount={10}
-				/>
-				<CategoryCard
-					icon={<HiMusicalNote size="30px" />}
-					name="Concert"
-					amount={20}
-				/>
-				<CategoryCard
-					icon={<HiGlobeAsiaAustralia size="30px" />}
-					name="Trips"
-					amount={10}
-				/>
+				{categories.isLoading &&
+					[...Array(6)].map((_v, _i) => (
+						<Skeleton h={"32"} borderRadius={"md"} />
+					))}
+				{categories.data &&
+					categories.data.map((_category) => (
+						<CategoryCard
+							key={_category.id}
+							id={_category.id}
+							icon={<Icon as={HiRectangleStack} boxSize={"5"} />}
+							name={_category.name}
+							amount={_category._count.events}
+						/>
+					))}
 			</SimpleGrid>
 		</Flex>
 	);
 };
 
 interface ICategoryCard {
+	id: number;
 	icon: ReactNode;
 	name: string;
 	amount: number;
 }
 
-const CategoryCard = ({ icon, name, amount }: ICategoryCard) => {
+const CategoryCard = ({ id, icon, name, amount }: ICategoryCard) => {
+	const setFilter = useFilter((state) => state.setFilterItem);
+	const setFinalFilter = useFilter((state) => state.setFinalFilter);
+	const navigate = useNavigate();
+
+	const handleClick = () => {
+		setFilter("category", id);
+		setFinalFilter();
+		navigate("/events");
+	};
+
 	return (
 		<Flex
+			onClick={handleClick}
 			_hover={{ background: "blue.900", boxShadow: "lg" }}
 			cursor="pointer"
 			background={"blue.800"}

@@ -450,8 +450,9 @@ const ReviewsList = () => {
 	return (
 		<Flex direction={"column"}>
 			{reviewQuery.data &&
-				reviewQuery.data.reviews.map((review, index) => (
+				reviewQuery.data.reviews.map((review) => (
 					<Flex
+						key={review.id}
 						direction={"column"}
 						p="4"
 						border={"1px solid #eee"}

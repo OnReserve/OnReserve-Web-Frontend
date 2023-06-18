@@ -213,8 +213,6 @@ const getEvents = async (params: GetEvents) => {
 	} else if (params.type === "popular") {
 		return await getPopularEvents();
 	} else {
-		console.log(params.filter);
-
 		const filterQuery = new URLSearchParams();
 		if (params.filter) {
 			let key: keyof typeof params.filter;
@@ -231,7 +229,9 @@ const getEvents = async (params: GetEvents) => {
 		console.log(filterQuery.toString());
 
 		const events = await axios
-			.get(`${baseURL}/events/filter?${filterQuery.toString()}`)
+			.get<IEventUserResponse[]>(
+				`${baseURL}/events/filter?${filterQuery.toString()}`
+			)
 			.then((res) => res.data);
 
 		return events;

@@ -30,14 +30,20 @@ import {
 	useRangeSlider,
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
-import { HiCalendar, HiCheckBadge, HiOutlineClock } from "react-icons/hi2";
-import { NavLink } from "react-router-dom";
+import {
+	HiCalendar,
+	HiCheckBadge,
+	HiMapPin,
+	HiOutlineClock,
+	HiOutlineMapPin,
+} from "react-icons/hi2";
+import { NavLink, useSearchParams } from "react-router-dom";
 import { Footer } from "../../components/Footer";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCategories } from "$lib/hooks/useCategories";
 import { useFilter } from "../../state/filterState";
 
@@ -48,7 +54,7 @@ export const EventsPage = () => {
 			<Flex
 				px="20"
 				py="10"
-				background={"gray.100"}
+				background={"gray.200"}
 				flex={"1"}
 				gap={"10"}
 				alignItems={"flex-start"}
@@ -65,10 +71,12 @@ export const EventsPage = () => {
 };
 
 const FilterSection = () => {
-	const [priceRange, setPriceRange] = useState([100, 500]);
 	const categories = useCategories();
 	const filter = useFilter((state) => state.filter);
 	const setFilter = useFilter((state) => state.setFilterItem);
+	const setFinalFilter = useFilter((state) => state.setFinalFilter);
+	const clear = useFilter((state) => state.clear);
+	const queryClient = useQueryClient();
 
 	return (
 		<Flex
@@ -91,10 +99,10 @@ const FilterSection = () => {
 								<FormControl isDisabled={categories.isLoading}>
 									<FormLabel>Event Type</FormLabel>
 									<Select
-										value={filter.categoryId}
+										value={filter.category}
 										onChange={(event) =>
 											setFilter(
-												"categoryId",
+												"category",
 												parseInt(event.target.value)
 											)
 										}
@@ -102,7 +110,10 @@ const FilterSection = () => {
 									>
 										{categories.data &&
 											categories.data.map((_category) => (
-												<option value={_category.id}>
+												<option
+													key={_category.id}
+													value={_category.id}
+												>
 													{_category.name}
 												</option>
 											))}
@@ -113,10 +124,10 @@ const FilterSection = () => {
 								<FormControl>
 									<FormLabel>From</FormLabel>
 									<Input
-										value={filter.eventStartDate}
+										value={filter.from}
 										onChange={(event) =>
 											setFilter(
-												"eventStartDate",
+												"from",
 												event.target.value
 											)
 										}
@@ -125,12 +136,12 @@ const FilterSection = () => {
 									/>
 								</FormControl>
 								<FormControl>
-									<FormLabel>To</FormLabel>
+									<FormLabel>Until</FormLabel>
 									<Input
-										value={filter.eventEndDate}
+										value={filter.until}
 										onChange={(event) =>
 											setFilter(
-												"eventEndDate",
+												"until",
 												event.target.value
 											)
 										}
@@ -141,12 +152,29 @@ const FilterSection = () => {
 							</Flex>
 							<Flex gap={"5"} mb="3">
 								<FormControl>
-									<FormLabel>Location</FormLabel>
+									<FormLabel>City</FormLabel>
 									<Input
-										value={filter.location}
+										value={filter.city}
 										onChange={(event) =>
 											setFilter(
-												"location",
+												"city",
+												event.target.value
+											)
+										}
+										type="text"
+										size={"sm"}
+										variant={"filled"}
+									/>
+								</FormControl>
+							</Flex>
+							<Flex gap={"5"} mb="3">
+								<FormControl>
+									<FormLabel>Venue</FormLabel>
+									<Input
+										value={filter.venue}
+										onChange={(event) =>
+											setFilter(
+												"venue",
 												event.target.value
 											)
 										}
@@ -163,9 +191,19 @@ const FilterSection = () => {
 										min={100}
 										max={1000}
 										step={50}
-										defaultValue={priceRange}
-										value={priceRange}
-										onChange={(val) => setPriceRange(val)}
+										defaultValue={[
+											filter.minPrice || 0,
+											filter.maxPrice || 500,
+										]}
+										value={[
+											filter.minPrice || 0,
+											filter.maxPrice || 500,
+										]}
+										onChange={(val) => {
+											const [min, max] = val;
+											setFilter("minPrice", min);
+											setFilter("maxPrice", max);
+										}}
 									>
 										<RangeSliderTrack>
 											<RangeSliderFilledTrack />
@@ -182,14 +220,12 @@ const FilterSection = () => {
 											type="number"
 											size="sm"
 											variant={"filled"}
-											value={priceRange[0]}
+											value={filter.minPrice}
 											onChange={(event) =>
-												setPriceRange((val) => [
-													parseInt(
-														event.target?.value
-													),
-													val[1],
-												])
+												setFilter(
+													"minPrice",
+													event.target.valueAsNumber
+												)
 											}
 										/>
 										<Input
@@ -197,21 +233,33 @@ const FilterSection = () => {
 											type="number"
 											size="sm"
 											variant={"filled"}
-											value={priceRange[1]}
+											value={filter.maxPrice}
 											onChange={(event) =>
-												setPriceRange((val) => [
-													val[0],
-													parseInt(
-														event.target?.value
-													),
-												])
+												setFilter(
+													"maxPrice",
+													event.target.valueAsNumber
+												)
 											}
 										/>
 									</Flex>
 								</FormControl>
 							</Flex>
-							<Button mt="10" colorScheme="blue" size={"sm"}>
+							<Button
+								mt="10"
+								colorScheme="blue"
+								size={"sm"}
+								onClick={() => setFinalFilter()}
+							>
 								Apply Filter
+							</Button>
+							<Button
+								mt="3"
+								variant={"ghost"}
+								colorScheme="blue"
+								size={"sm"}
+								onClick={clear}
+							>
+								Clear
 							</Button>
 						</Flex>
 					</AccordionPanel>
@@ -223,22 +271,33 @@ const FilterSection = () => {
 };
 
 const ResultSection = () => {
-	const upcomingEvents = useQuery({
-		queryKey: ["upcomingEvents"],
-		queryFn: () => eventAPI.getUpcomingEvents(),
+	const [params] = useSearchParams();
+	const keyword = params.get("keyword") || undefined;
+	const finalFilter = useFilter((state) => state.finalFilter);
+
+	const events = useQuery({
+		queryKey: ["events", keyword, finalFilter],
+		queryFn: () =>
+			eventAPI.getEvents({
+				type:
+					keyword || Object.keys(finalFilter).length > 0
+						? "filter"
+						: "upcoming",
+				filter: { ...finalFilter, keyword },
+			}),
 	});
 
-	if (upcomingEvents.isLoading) {
+	if (events.isLoading) {
 		return (
 			<Flex direction={"column"} borderRadius={"lg"} gap={"3"}>
 				{[...Array(6)].map((_v, _i) => (
-					<EventLoading />
+					<EventLoading key={_i} />
 				))}
 			</Flex>
 		);
 	}
 
-	if (upcomingEvents.error) {
+	if (events.error) {
 		return (
 			<Alert flexDirection={"column"} status="error">
 				<AlertIcon boxSize={"10"} mb="4" />
@@ -251,9 +310,14 @@ const ResultSection = () => {
 	}
 
 	return (
-		<Flex direction={"column"} borderRadius={"lg"} gap={"1"}>
-			{upcomingEvents.data &&
-				upcomingEvents.data.map((event) => (
+		<Flex direction={"column"} borderRadius={"lg"} gap={"3"}>
+			{keyword && (
+				<Text fontSize={"md"} mb="5" fontWeight={"normal"}>
+					Results for <b>{keyword}</b>
+				</Text>
+			)}
+			{events.data &&
+				events.data.map((event: IEventUserResponse) => (
 					<EventCard event={event} key={event.id} />
 				))}
 		</Flex>
@@ -270,8 +334,7 @@ const EventCard = ({ event }: { event: IEventUserResponse }) => {
 			as={NavLink}
 			to={`/events/${event.id}`}
 			my="1"
-			p="5"
-			borderRadius={"md"}
+			borderRadius={"lg"}
 			background={"white"}
 			cursor={"pointer"}
 			transition={"all 300ms ease-out"}
@@ -282,21 +345,21 @@ const EventCard = ({ event }: { event: IEventUserResponse }) => {
 		>
 			<Img
 				mr={"5"}
-				width={"40"}
-				height={"40"}
+				width={"250px"}
+				h={"200px"}
 				objectFit={"cover"}
 				src={event.galleries[0].eventPhoto}
-				borderRadius={"md"}
+				borderLeftRadius={"lg"}
 			></Img>
 			<Flex
 				flex={"1"}
 				direction={"column"}
 				justifyContent={"space-between"}
-				p="2"
+				p="5"
 			>
 				<Flex direction={"column"} gap={"2"}>
 					<Heading fontSize={"xl"}>{event.title}</Heading>
-					<HStack>
+					<HStack color={"gray.600"} fontWeight={"bold"}>
 						<Text>{event.company?.name}</Text>
 						<Text color="blue.500">
 							<HiCheckBadge />
@@ -319,9 +382,19 @@ const EventCard = ({ event }: { event: IEventUserResponse }) => {
 							<HiOutlineClock />
 							{dayjs(event.eventStartTime).format("hh:mm A")}
 						</Text>
+						{event.locations && (
+							<Text
+								textTransform={"uppercase"}
+								color={"gray.700"}
+								fontSize={"sm"}
+							>
+								<HiOutlineMapPin />
+								{event?.locations[0].venue}
+							</Text>
+						)}
 					</Flex>
 				</Flex>
-				<Flex justifyContent={"space-between"}>
+				<Flex justifyContent={"space-between"} mt="3">
 					<HStack>
 						{event.economySeats && (
 							<Tag variant={"subtle"} colorScheme="blue">

@@ -112,6 +112,14 @@ const getUpcomingEvents = async () => {
 	return events;
 };
 
+const getPopularEvents = async () => {
+	const events = await axios
+		.get<IEventUserResponse[]>(`${baseURL}/events/popular`)
+		.then((res) => res.data);
+
+	return events;
+};
+
 const getEventDetails = async (eventId: number) => {
 	const detail = await axios
 		.get<IEventUserResponse>(`${baseURL}/event/${eventId}`)
@@ -185,6 +193,51 @@ const addBooking = async (
 	return booking;
 };
 
+type GetEvents = {
+	type: "filter" | "popular" | "upcoming";
+	filter?: {
+		keyword?: string;
+		category?: number;
+		from?: string | Date;
+		until?: string | Date;
+		city?: string;
+		venue?: string;
+		minPrice?: number;
+		maxPrice?: number;
+	};
+};
+
+const getEvents = async (params: GetEvents) => {
+	if (params.type === "upcoming") {
+		return await getUpcomingEvents();
+	} else if (params.type === "popular") {
+		return await getPopularEvents();
+	} else {
+		console.log(params.filter);
+
+		const filterQuery = new URLSearchParams();
+		if (params.filter) {
+			let key: keyof typeof params.filter;
+			for (key in params.filter) {
+				if (params.filter[key]) {
+					filterQuery.append(
+						key,
+						params.filter[key]?.toString() || ""
+					);
+				}
+			}
+		}
+
+		console.log(filterQuery.toString());
+
+		const events = await axios
+			.get(`${baseURL}/events/filter?${filterQuery.toString()}`)
+			.then((res) => res.data);
+
+		return events;
+	}
+};
+
 export const eventAPI = {
 	addEvent,
 	editEvent,
@@ -193,4 +246,5 @@ export const eventAPI = {
 	getUpcomingEvents,
 	getEventDetails,
 	addBooking,
+	getEvents,
 };

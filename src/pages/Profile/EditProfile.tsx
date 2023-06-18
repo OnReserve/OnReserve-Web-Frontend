@@ -15,7 +15,6 @@ import {
 	Icon,
 	Img,
 	Input,
-	Link,
 	Modal,
 	ModalBody,
 	ModalCloseButton,

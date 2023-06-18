@@ -9,6 +9,7 @@ import {
 	Input,
 	InputGroup,
 	InputLeftElement,
+	InputRightElement,
 	Menu,
 	MenuButton,
 	MenuItem,
@@ -20,8 +21,9 @@ import {
 	HiMagnifyingGlass,
 	HiUserCircle,
 } from "react-icons/hi2";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useUser } from "../state/userState";
+import { FormEvent, useState } from "react";
 
 export const Navbar = () => {
 	const user = useUser((state) => state.user);
@@ -66,20 +68,7 @@ export const Navbar = () => {
 					</Button>
 				)}
 			</ButtonGroup>
-			<Flex>
-				<FormControl>
-					<InputGroup>
-						<InputLeftElement>
-							<HiMagnifyingGlass />
-						</InputLeftElement>
-						<Input
-							borderRadius={"20px"}
-							variant={"outline"}
-							placeholder="Search"
-						></Input>
-					</InputGroup>
-				</FormControl>
-			</Flex>
+			<SearchBar />
 			{user ? (
 				<ButtonGroup variant={"outline"}>
 					<Button
@@ -118,6 +107,46 @@ export const Navbar = () => {
 					</Button>
 				</ButtonGroup>
 			)}
+		</Flex>
+	);
+};
+
+const SearchBar = () => {
+	const [params, setParams] = useSearchParams();
+	const [search, setSearch] = useState(params.get("keyword") || "");
+	const navigate = useNavigate();
+
+	const handleSearch = (event: FormEvent) => {
+		event.preventDefault();
+		navigate("/events");
+		setParams(new URLSearchParams([["keyword", search]]));
+	};
+
+	return (
+		<Flex as={"form"} onSubmit={handleSearch}>
+			<FormControl>
+				<InputGroup>
+					<InputRightElement>
+						<IconButton
+							aria-label="search"
+							type="submit"
+							variant={"ghost"}
+							borderRadius={"100%"}
+						>
+							<HiMagnifyingGlass />
+						</IconButton>
+					</InputRightElement>
+					<Input
+						borderRadius={"20px"}
+						variant={"outline"}
+						placeholder="Search Event"
+						type="search"
+						name="keyword"
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+					></Input>
+				</InputGroup>
+			</FormControl>
 		</Flex>
 	);
 };

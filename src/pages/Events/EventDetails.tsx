@@ -26,6 +26,8 @@ import {
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
 import {
+	HiArrowDownOnSquare,
+	HiArrowTopRightOnSquare,
 	HiCheckBadge,
 	HiOutlineStar,
 	HiPencil,
@@ -39,9 +41,10 @@ import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
 import { useUser } from "../../state/userState";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Gallery } from "$lib/api/event";
 import { IReviewRequest, reviewAPI } from "$lib/api/review";
+import { myConstants } from "$config/theme";
 
 export const EventsDetailsPage = () => {
 	const { eventId } = useParams();
@@ -56,7 +59,7 @@ export const EventsDetailsPage = () => {
 		<Flex direction="column">
 			<Navbar />
 			<Flex
-				px="20"
+				px={myConstants.pagePadding}
 				py="10"
 				w="100%"
 				gap={"10"}
@@ -121,7 +124,7 @@ export const EventsDetailsPage = () => {
 							query.data.galleries.length > 0 && (
 								<ImageGallery gallery={query.data.galleries} />
 							)}
-						<Flex>
+						<Flex direction={["column", "column", "row"]}>
 							<Flex flex="2" direction={"column"}>
 								<Flex>
 									<Heading mb="4" flex={1}>
@@ -138,7 +141,15 @@ export const EventsDetailsPage = () => {
 												as={Link}
 												to={`/event/edit/${query.data.id}`}
 											>
-												Edit
+												<Text
+													display={[
+														"none",
+														"none",
+														"inline-block",
+													]}
+												>
+													Edit
+												</Text>
 											</Button>
 											<Button
 												leftIcon={<Icon as={HiTrash} />}
@@ -146,7 +157,15 @@ export const EventsDetailsPage = () => {
 												variant={"ghost"}
 												onClick={deleteDialog.onOpen}
 											>
-												Delete
+												<Text
+													display={[
+														"none",
+														"none",
+														"inline-block",
+													]}
+												>
+													Delete
+												</Text>
 											</Button>
 											<DeleteDialog
 												eventId={eventId || "0"}
@@ -231,19 +250,75 @@ export const EventsDetailsPage = () => {
 									</Heading>
 									{query.data.locations &&
 										query.data.locations[0] && (
-											<img
-												src={`http://maps.googleapis.com/maps/api/staticmap?center=${query.data.locations[0].longitude},${query.data.locations[0].latitude}&zoom=11&size=200x200&sensor=false`}
-											></img>
+											<Flex
+												wrap={"wrap"}
+												direction={"column"}
+												gap={"3"}
+											>
+												<Stat
+													border={"1px"}
+													borderColor={"gray.200"}
+													p="3"
+												>
+													<StatLabel>City</StatLabel>
+													<StatNumber>
+														{
+															query.data
+																.locations[0]
+																.city
+														}
+													</StatNumber>
+												</Stat>
+												<Stat
+													border={"1px"}
+													borderColor={"gray.200"}
+													p="3"
+												>
+													<StatLabel>
+														Street
+													</StatLabel>
+													<StatNumber>
+														{
+															query.data
+																.locations[0]
+																.street
+														}
+													</StatNumber>
+												</Stat>
+												<Stat
+													border={"1px"}
+													borderColor={"gray.200"}
+													p="3"
+												>
+													<StatLabel>Venue</StatLabel>
+													<StatNumber>
+														{
+															query.data
+																.locations[0]
+																.venue
+														}
+													</StatNumber>
+												</Stat>
+											</Flex>
 										)}
 								</Flex>
 								<Button
 									as={NavLink}
-									to={`/reserve/${query.data.id}`}
+									to={
+										dayjs(
+											query.data.eventDeadline
+										).isBefore()
+											? "#"
+											: `/reserve/${query.data.id}`
+									}
 									my="20"
 									background={"blue.900"}
 									colorScheme="blue"
+									size={"lg"}
 								>
-									Reserve
+									{dayjs(query.data.eventDeadline).isBefore()
+										? "Event Deadline passed"
+										: "Reserve"}
 								</Button>
 							</Flex>
 							<EventReviews />
@@ -267,14 +342,21 @@ const ImageGallery = ({ gallery }: { gallery: Gallery[] }) => {
 				maxHeight={"300px"}
 				objectFit={"cover"}
 			/>
-			<Flex gap={"5"} my="5" direction={"row"} wrap={"wrap"}>
+			<Flex
+				gap={"5"}
+				my="5"
+				direction={"row"}
+				wrap={"wrap"}
+				overflow={"auto"}
+				width={"100%"}
+			>
 				{gallery.map((_img) => (
 					<Img
 						key={_img.id}
 						onClick={() => setSelected(_img.eventPhoto)}
 						borderRadius={"md"}
 						src={_img.eventPhoto}
-						height={"100px"}
+						height={["70px", "100px"]}
 						objectFit={"cover"}
 					/>
 				))}
@@ -331,7 +413,7 @@ const DeleteDialog = ({ eventId, isOpen, onClose }: DialogProps) => {
 
 const EventReviews = () => {
 	return (
-		<Flex direction={"column"} ml="10" flex="1">
+		<Flex direction={"column"} ml={[0, 0, "10"]} flex="1">
 			<Heading fontSize={"2xl"} mb="5">
 				Reviews
 			</Heading>

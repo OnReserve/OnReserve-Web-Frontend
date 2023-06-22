@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useCategories } from "$lib/hooks/useCategories";
 import { useFilter } from "../../state/filterState";
+import { myConstants } from "$config/theme";
 
 export const LandingPage = () => {
 	return (
@@ -40,7 +41,7 @@ export const LandingPage = () => {
 
 const PopularSection = () => {
 	return (
-		<Flex direction={"column"} px="32" mt="5">
+		<Flex direction={"column"} px={myConstants.pagePadding} mt="5">
 			<Heading fontSize={"2xl"} mb="5" color={"gray.700"}>
 				Popular
 			</Heading>
@@ -166,11 +167,15 @@ const PopularListCard = ({
 const CategorySection = () => {
 	const categories = useCategories();
 	return (
-		<Flex direction={"column"} px="32" my="20">
+		<Flex
+			direction={"column"}
+			px={myConstants.pagePadding}
+			my={["10", "20"]}
+		>
 			<Heading fontSize={"2xl"} mb="5" color={"gray.700"}>
 				Category
 			</Heading>
-			<SimpleGrid columns={[2, 2, 3]} gap={"5"}>
+			<SimpleGrid columns={[2, 2, 3]} gap={["2", "4", "5"]}>
 				{categories.isLoading &&
 					[...Array(6)].map((_v, _i) => (
 						<Skeleton h={"32"} borderRadius={"md"} />
@@ -215,13 +220,13 @@ const CategoryCard = ({ id, icon, name, amount }: ICategoryCard) => {
 			cursor="pointer"
 			background={"blue.800"}
 			transition="all 300ms ease-out"
-			p="6"
+			p={["3", "4", "6"]}
 			borderRadius={"lg"}
-			gap="6"
+			gap={["3", "4", "6"]}
 		>
 			<Flex
 				background={"white"}
-				p="5"
+				p={["3", "3", "5"]}
 				alignItems={"center"}
 				justifyContent={"center"}
 				borderRadius={"md"}
@@ -235,10 +240,10 @@ const CategoryCard = ({ id, icon, name, amount }: ICategoryCard) => {
 				flex="1"
 				justifyContent={"center"}
 			>
-				<Heading fontSize={"xl"} mb="2">
+				<Heading fontSize={["lg", "xl"]} mb="2">
 					{name}
 				</Heading>
-				<Text>{amount} Available</Text>
+				<Text fontSize={["sm", "md"]}>{amount} Available</Text>
 			</Flex>
 		</Flex>
 	);
@@ -246,9 +251,9 @@ const CategoryCard = ({ id, icon, name, amount }: ICategoryCard) => {
 
 const ReasonSection = () => {
 	return (
-		<Flex my="20" px="32" gap={"10"}>
+		<Flex my={["10", "20"]} px={myConstants.pagePadding} gap={"10"}>
 			<Flex flex="1" direction={"column"}>
-				<Heading fontSize={"5xl"} mb="16">
+				<Heading fontSize={["4xl", "5xl"]} mb="16">
 					Why you reserve on OnReserve?
 				</Heading>
 				<ReasonCard
@@ -265,6 +270,7 @@ const ReasonSection = () => {
 				/>
 			</Flex>
 			<Img
+				display={["none", "none", "block"]}
 				flex={"1"}
 				src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=481&q=80"
 				objectFit={"cover"}
@@ -304,9 +310,9 @@ const ReasonCard = ({ title, desc, icon }: IReasonCard) => {
 
 const TrustedBySection = () => {
 	return (
-		<Flex direction={"column"} px="32" my="20">
+		<Flex direction={"column"} px={myConstants.pagePadding} my="20">
 			<Heading mb="10">Trusted By Leading Companies</Heading>
-			<SimpleGrid columns={[1, 2, 2]} gap={"10"} position={"relative"}>
+			<SimpleGrid columns={[1, 1, 2]} gap={"10"} position={"relative"}>
 				<Flex
 					background={"blue.400"}
 					direction={"column"}
@@ -341,18 +347,6 @@ const TrustedBySection = () => {
 						eligendi culpa? Facilis.
 					</Text>
 				</Flex>
-				<IconButton
-					aria-label="See All"
-					icon={<HiArrowRight />}
-					position={"absolute"}
-					top="50%"
-					transform={"translate(0, -50%)"}
-					right={"-20px"}
-					boxShadow="lg"
-					colorScheme="gray"
-					borderRadius={"100%"}
-					size={"lg"}
-				/>
 			</SimpleGrid>
 		</Flex>
 	);

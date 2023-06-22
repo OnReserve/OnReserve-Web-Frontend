@@ -21,6 +21,7 @@ export const SignUp = () => {
 	return (
 		<Flex width={"100%"} minHeight={"100vh"} overflow={"hidden"}>
 			<Flex
+				display={["none", "none", "flex"]}
 				flex="1"
 				background={
 					"linear-gradient(180deg, #000, transparent), url(https://unsplash.com/photos/NYrVisodQ2M/download?ixid=MnwxMjA3fDB8MXxzZWFyY2h8Mnx8Y29uY2VydHxlbnwwfHx8fDE2ODMzNzExODU&force=true&w=1920)"
@@ -45,7 +46,7 @@ export const SignUp = () => {
 				justifyContent={"center"}
 				background={"gray.200"}
 				overflow={"auto"}
-				p="10"
+				p={["2", "4", "10"]}
 			>
 				<RegisterForm />
 			</Flex>
@@ -63,13 +64,7 @@ const RegisterForm = () => {
 		onSubmit: async (val) => {
 			try {
 				const user = await userAPI.signUp(val);
-				const { message, ...info } = user;
-				toast({
-					title: "Success",
-					description: message,
-					status: "success",
-				});
-				setUser(info);
+				setUser(user);
 			} catch (error) {
 				if (error instanceof AxiosError) {
 					toast({
@@ -89,11 +84,14 @@ const RegisterForm = () => {
 			background={"white"}
 			borderRadius={"lg"}
 			boxShadow={"md"}
-			p="10"
+			p={["5", "10"]}
 			direction={"column"}
-			width={"75%"}
+			width={"full"}
 		>
-			<Heading mb="10" textAlign={"center"}>
+			<Heading as={NavLink} to={"/"} textAlign={"center"}>
+				OnReserve
+			</Heading>
+			<Heading mb="10" textAlign={"center"} fontSize={"lg"}>
 				Create an Account
 			</Heading>
 			<Flex direction={"column"} gap={"5"}>

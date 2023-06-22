@@ -6,3 +6,7 @@ export const extendedTheme = extendTheme({
 		body: `'Source Sans Pro', sans-serif`,
 	},
 });
+
+export const myConstants = {
+	pagePadding: ["5", "10", "20"],
+};

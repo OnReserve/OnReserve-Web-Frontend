@@ -45,6 +45,7 @@ import { AuthGuard } from "../../components/AuthGuard";
 import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import { EditProfileDialog } from "./EditProfile";
+import { myConstants } from "$config/theme";
 
 export const ProfileViewPage = () => {
 	return (
@@ -54,13 +55,13 @@ export const ProfileViewPage = () => {
 				<Flex
 					minHeight={"100vh"}
 					direction={"column"}
-					px="20"
+					px={myConstants.pagePadding}
 					py="5"
 					background={"gray.100"}
 				>
 					<Flex
 						gap={"10"}
-						alignItems={"flex-start"}
+						alignItems={["stretch", "stretch", "flex-start"]}
 						direction={["column", "column", "row"]}
 					>
 						<ProfileCard />
@@ -147,7 +148,18 @@ const CompaniesCard = () => {
 			<AddCompanyDialog isOpen={isOpen} onClose={onClose} />
 			<Flex alignItems={"center"} justifyContent={"space-between"}>
 				<Heading fontSize={"2xl"}>Companies</Heading>
+
+				<IconButton
+					aria-label="add-company"
+					display={["flex", "flex", "none"]}
+					icon={<HiPlus />}
+					size={"sm"}
+					colorScheme="blue"
+					onClick={onOpen}
+				></IconButton>
+
 				<Button
+					display={["none", "none", "flex"]}
 					leftIcon={<HiPlus />}
 					size={"sm"}
 					colorScheme="blue"
@@ -162,7 +174,7 @@ const CompaniesCard = () => {
 				maxHeight={"400px"}
 				overflow={"auto"}
 			>
-				<Table>
+				<Table height={"full"}>
 					<CompaniesList />
 				</Table>
 			</Flex>

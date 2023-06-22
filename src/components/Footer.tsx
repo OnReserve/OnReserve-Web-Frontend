@@ -1,3 +1,4 @@
+import { myConstants } from "$config/theme";
 import {
 	Flex,
 	SimpleGrid,
@@ -12,10 +13,11 @@ export const Footer = () => {
 	return (
 		<Flex direction={"column"} background={"gray.200"}>
 			<SimpleGrid
-				columns={[1, 1, 3]}
-				px="32"
+				columns={[1, 2, 3]}
+				px={myConstants.pagePadding}
 				py="20"
-				justifyItems={"center"}
+				justifyItems={["flex-start", "flex-start", "center"]}
+				gap={"10"}
 			>
 				<Flex direction={"column"}>
 					<Heading mb="5" fontSize={"2xl"}>

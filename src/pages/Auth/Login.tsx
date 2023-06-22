@@ -26,7 +26,7 @@ export const Login = () => {
 			overflow={["auto", "hidden"]}
 		>
 			<Flex
-				display={["none", "flex"]}
+				display={["none", "none", "flex"]}
 				flex={["none", "1"]}
 				background={
 					"linear-gradient(180deg, #000, transparent), url(https://unsplash.com/photos/NYrVisodQ2M/download?ixid=MnwxMjA3fDB8MXxzZWFyY2h8Mnx8Y29uY2VydHxlbnwwfHx8fDE2ODMzNzExODU&force=true&w=1920)"
@@ -56,7 +56,8 @@ export const Login = () => {
 				<Flex
 					background={"white"}
 					direction={"column"}
-					p={["5", "20"]}
+					m={["2", "0", "0"]}
+					p={["5", "10", "20"]}
 					width={["100%", "75%"]}
 					borderRadius={"lg"}
 					boxShadow={"lg"}

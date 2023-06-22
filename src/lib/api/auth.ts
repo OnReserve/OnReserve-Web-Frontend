@@ -36,15 +36,9 @@ export interface ISignupParams {
 	password: string;
 }
 
-export interface ISignupResponse {
-	message: string;
-	userId: string;
-	token: string;
-}
-
 const signUp = async (data: ISignupParams) => {
 	const user = await axios
-		.post<ISignupResponse>(`${baseURL}/auth/register`, data)
+		.post<ILoginResponse>(`${baseURL}/auth/register`, data)
 		.then((res) => res.data);
 	return user;
 };

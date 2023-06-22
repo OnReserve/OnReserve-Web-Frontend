@@ -45,6 +45,7 @@ import {
 import { Field, Form, Formik } from "formik";
 import { AxiosError } from "axios";
 import { formatDateForUserEvent } from "$config/dayjs.config";
+import { myConstants } from "$config/theme";
 
 export const CompanyDetailsPage = () => {
 	return (
@@ -54,7 +55,7 @@ export const CompanyDetailsPage = () => {
 				<Flex
 					minHeight={"100vh"}
 					direction={"column"}
-					px="20"
+					px={myConstants.pagePadding}
 					py="5"
 					background={"gray.100"}
 				>
@@ -252,6 +253,7 @@ const EventsList = ({ events }: { events: EventResponse[] }) => {
 			<Grid
 				gridTemplateColumns="repeat(auto-fill, minmax(250px, 1fr))"
 				mt="5"
+				gap={"10"}
 			>
 				{events.map((event) => (
 					<EventCard event={event} />

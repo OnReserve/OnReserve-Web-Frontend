@@ -37,6 +37,7 @@ import { eventAPI } from "$lib/api/event";
 import { AxiosError } from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useRef } from "react";
+import { myConstants } from "$config/theme";
 
 export const EditEventPage = () => {
 	return (
@@ -45,7 +46,7 @@ export const EditEventPage = () => {
 				<Navbar />
 				<Flex
 					minHeight={"100vh"}
-					px={"32"}
+					px={myConstants.pagePadding}
 					py="5"
 					background={"gray.100"}
 					direction={"column"}
@@ -169,7 +170,7 @@ const AddEventForm = () => {
 
 	return (
 		<Flex
-			p="10"
+			p={["4", "6", "10"]}
 			borderRadius={"lg"}
 			background={"white"}
 			boxShadow={"base"}
@@ -179,7 +180,7 @@ const AddEventForm = () => {
 			<DateInformation formik={formik} />
 			<LocationInformation formik={formik} />
 			<SeatInformation formik={formik} />
-			<ImageUpload formik={formik} />
+			{/* <ImageUpload formik={formik} /> */}
 			<ButtonGroup mt="20" alignSelf={"flex-end"}>
 				<Button
 					colorScheme="blue"
@@ -229,7 +230,7 @@ function DateInformation({ formik }: { formik: FormikProps<any> }) {
 			<Heading fontSize={"xl"} mt="10" mb="5">
 				Date & Time Information
 			</Heading>
-			<Flex gap="5" mb="5">
+			<Flex gap="5" mb="5" direction={["column", "column", "row"]}>
 				<FormikInput
 					formik={formik}
 					type="datetime-local"
@@ -259,7 +260,7 @@ function LocationInformation({ formik }: { formik: FormikProps<any> }) {
 			<Heading fontSize={"xl"} mt="10" mb="5">
 				Location Information
 			</Heading>
-			<Flex gap={"5"} mb="5">
+			<Flex gap={"5"} mb="5" direction={["column", "column", "row"]}>
 				<FormikInput
 					formik={formik}
 					type="text"
@@ -289,7 +290,7 @@ function LocationInformation({ formik }: { formik: FormikProps<any> }) {
 
 				<FormikInput
 					formik={formik}
-					type="text"
+					type="number"
 					name="longitude"
 					placeholder="Longitude"
 				/>

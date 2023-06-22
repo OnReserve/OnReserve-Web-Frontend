@@ -78,7 +78,7 @@ const ListOfBookings = () => {
 				query.data.map((_ticket, _index) => (
 					<Flex
 						as={NavLink}
-						to={`/ticket/${_ticket.id}`}
+						to={`/profile/booking/${_ticket.id}`}
 						direction={"column"}
 						p="5"
 						background={"white"}
@@ -97,10 +97,16 @@ const ListOfBookings = () => {
 							<Badge
 								ml="4"
 								colorScheme={
-									_ticket.approved ? "green" : "gray"
+									_ticket.completed
+										? "blue"
+										: _ticket.approved
+										? "green"
+										: "gray"
 								}
 							>
-								{_ticket.approved
+								{_ticket.completed
+									? "Completed"
+									: _ticket.approved
 									? "Approved"
 									: "Waiting for Payment"}
 							</Badge>

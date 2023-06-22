@@ -44,6 +44,7 @@ import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { categoryAPI } from "$lib/api/categories";
 import { useCategories } from "$lib/hooks/useCategories";
+import { myConstants } from "$config/theme";
 
 interface IAddEventPage {
 	isEdit?: boolean;
@@ -56,7 +57,7 @@ export const AddEventPage = ({ isEdit }: IAddEventPage) => {
 				<Navbar />
 				<Flex
 					minHeight={"100vh"}
-					px={"32"}
+					px={myConstants.pagePadding}
 					py="5"
 					background={"gray.100"}
 					direction={"column"}
@@ -193,7 +194,7 @@ const AddEventForm = ({ isEdit }: { isEdit?: boolean }) => {
 			{(formik) => (
 				<Flex
 					as={Form}
-					p="10"
+					p={["4", "10"]}
 					borderRadius={"lg"}
 					background={"white"}
 					boxShadow={"base"}
@@ -248,7 +249,7 @@ function DateInformation({ formik }: { formik: FormikProps<any> }) {
 			<Heading fontSize={"xl"} mt="10" mb="5">
 				Date & Time Information
 			</Heading>
-			<Flex gap="5" mb="5">
+			<Flex gap="5" mb="5" direction={["column", "column", "row"]}>
 				<FormikInput
 					formik={formik}
 					type="datetime-local"
@@ -278,7 +279,7 @@ function LocationInformation({ formik }: { formik: FormikProps<any> }) {
 			<Heading fontSize={"xl"} mt="10" mb="5">
 				Location Information
 			</Heading>
-			<Flex gap={"5"} mb="5">
+			<Flex gap={"5"} mb="5" direction={["column", "column", "row"]}>
 				<FormikInput
 					formik={formik}
 					type="text"
@@ -308,7 +309,7 @@ function LocationInformation({ formik }: { formik: FormikProps<any> }) {
 
 				<FormikInput
 					formik={formik}
-					type="text"
+					type="number"
 					name="longitude"
 					placeholder="Longitude"
 				/>
@@ -319,7 +320,7 @@ function LocationInformation({ formik }: { formik: FormikProps<any> }) {
 
 function SeatInformation() {
 	return (
-		<Flex mt="5" direction={"column"}>
+		<Flex mt="5" direction={"column"} overflowX={"auto"}>
 			<Heading fontSize={"xl"} mb="5">
 				Seat information
 			</Heading>
@@ -337,6 +338,7 @@ function SeatInformation() {
 						<Td>
 							<Field
 								as={Input}
+								type="number"
 								name="economySeats"
 								placeholder="Economy Seats"
 							/>
@@ -344,6 +346,7 @@ function SeatInformation() {
 						<Td>
 							<Field
 								as={Input}
+								type="number"
 								name="economyPrice"
 								placeholder="Economy Price"
 							/>
@@ -354,6 +357,7 @@ function SeatInformation() {
 						<Td>
 							<Field
 								as={Input}
+								type="number"
 								name="vipSeats"
 								placeholder="VIP Seats"
 							/>
@@ -361,6 +365,7 @@ function SeatInformation() {
 						<Td>
 							<Field
 								as={Input}
+								type="number"
 								name="vipPrice"
 								placeholder="VIP Price"
 							/>

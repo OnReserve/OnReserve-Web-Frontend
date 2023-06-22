@@ -41,8 +41,6 @@ export const BookingDetails = () => {
 		content: () => printRef.current,
 	});
 
-	console.log(printRef.current);
-
 	return (
 		<AuthGuard>
 			<Flex direction={"column"} background={"gray.100"}>
@@ -50,15 +48,15 @@ export const BookingDetails = () => {
 				<Container minH={"100vh"} py="3">
 					{query.data && (
 						<>
-							<Ticket data={query.data} />
-							{/* <Button
+							<Ticket data={query.data} ref={printRef} />
+							<Button
 								colorScheme="blue"
 								mt="10"
 								leftIcon={<HiPrinter />}
 								onClick={handlePrint}
 							>
 								Print Ticket
-							</Button> */}
+							</Button>
 						</>
 					)}
 				</Container>

@@ -60,11 +60,11 @@ const routerConfig = createBrowserRouter([
 		element: <CompanyDetailsPage />,
 	},
 	{
-		path: "/tickets",
+		path: "/profile/bookings",
 		element: <BookingPage />,
 	},
 	{
-		path: "/ticket/:id",
+		path: "/profile/booking/:id",
 		element: <BookingDetails />,
 	},
 	{

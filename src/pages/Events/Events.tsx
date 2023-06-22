@@ -46,19 +46,21 @@ import dayjs from "dayjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCategories } from "$lib/hooks/useCategories";
 import { useFilter } from "../../state/filterState";
+import { myConstants } from "$config/theme";
 
 export const EventsPage = () => {
 	return (
 		<Flex direction={"column"} width={"100%"} minHeight={"100vh"}>
 			<Navbar />
 			<Flex
-				px="20"
-				py="10"
+				px={myConstants.pagePadding}
+				py={["5", "10"]}
 				background={"gray.200"}
 				flex={"1"}
-				gap={"10"}
+				gap={["5", "10"]}
 				alignItems={"flex-start"}
 				minH={"100vh"}
+				direction={["column", "column", "row"]}
 			>
 				<FilterSection />
 				<Flex direction="column" flex={"3"}>
@@ -76,12 +78,11 @@ const FilterSection = () => {
 	const setFilter = useFilter((state) => state.setFilterItem);
 	const setFinalFilter = useFilter((state) => state.setFinalFilter);
 	const clear = useFilter((state) => state.clear);
-	const queryClient = useQueryClient();
 
 	return (
 		<Flex
 			direction={"column"}
-			flex={"1"}
+			flex={["0", "0", "1"]}
 			borderRadius={"lg"}
 			background={"white"}
 		>
@@ -339,17 +340,19 @@ const EventCard = ({ event }: { event: IEventUserResponse }) => {
 			cursor={"pointer"}
 			transition={"all 300ms ease-out"}
 			boxShadow={"base"}
+			direction={["column", "row"]}
 			_hover={{
 				boxShadow: "md",
 			}}
 		>
 			<Img
 				mr={"5"}
-				width={"250px"}
+				width={["full", "250px"]}
 				h={"200px"}
 				objectFit={"cover"}
 				src={event.galleries[0].eventPhoto}
-				borderLeftRadius={"lg"}
+				borderLeftRadius={["none", "lg"]}
+				borderTopRadius={["lg", "none"]}
 			></Img>
 			<Flex
 				flex={"1"}

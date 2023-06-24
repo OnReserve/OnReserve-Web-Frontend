@@ -38,7 +38,7 @@ import { useUser } from "../../state/userState";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
-import { companyAPI } from "$lib/api/company";
+import { ICompany, companyAPI } from "$lib/api/company";
 import { FormikInput } from "$pages/Auth/components/FormikInput";
 import { useFormik } from "formik";
 import { AuthGuard } from "../../components/AuthGuard";
@@ -46,6 +46,8 @@ import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import { EditProfileDialog } from "./EditProfile";
 import { myConstants } from "$config/theme";
+import { EditCompanyDialog } from "$pages/Company/EditCompany";
+import { useState } from "react";
 
 export const ProfileViewPage = () => {
 	return (
@@ -183,6 +185,8 @@ const CompaniesCard = () => {
 };
 
 const CompaniesList = () => {
+	const editDialog = useDisclosure();
+	const [company, setCompany] = useState({} as ICompany);
 	const user = useUser((state) => state.user);
 	const query = useQuery({
 		queryKey: ["userCompany", user?.id],
@@ -191,63 +195,70 @@ const CompaniesList = () => {
 
 	if (query.isLoading) {
 		return (
-			<Tbody>
-				{[...Array(3)].map((_v, _i) => (
-					<Tr key={_i}>
-						<Td>
-							<SkeletonText noOfLines={1} width={"100%"} />
-						</Td>
-						<Td>
-							<SkeletonText noOfLines={1} width={"100%"} />
-						</Td>
-						<Td>
-							<SkeletonText noOfLines={1} width={"100%"} />
-						</Td>
-					</Tr>
-				))}
-			</Tbody>
+			<>
+				<Tbody>
+					{[...Array(3)].map((_v, _i) => (
+						<Tr key={_i}>
+							<Td>
+								<SkeletonText noOfLines={1} width={"100%"} />
+							</Td>
+							<Td>
+								<SkeletonText noOfLines={1} width={"100%"} />
+							</Td>
+							<Td>
+								<SkeletonText noOfLines={1} width={"100%"} />
+							</Td>
+						</Tr>
+					))}
+				</Tbody>
+			</>
 		);
 	}
 
 	return (
-		<Tbody>
-			{query.data &&
-				query.data.map((current) => (
-					<Tr key={current.company.id}>
-						{/* <Td>
+		<>
+			<EditCompanyDialog {...editDialog} company={company} />
+			<Tbody>
+				{query.data &&
+					query.data.map((current) => (
+						<Tr key={current.company.id}>
+							{/* <Td>
 							<Avatar src={current.company.profPic} size={"sm"} />
 						</Td> */}
-						<Td textAlign={"start"}>
-							<Text
-								as={Link}
-								color={"blue.800"}
-								to={`/company/${current.company.id}`}
-							>
-								{current.company.name}
-							</Text>
-						</Td>
-						<Td>
-							<Tag fontWeight={"bold"}>
-								{current.company._count.users} Admins
-							</Tag>
-						</Td>
-						<Td>
-							<Tag fontWeight={"bold"}>
-								{current.company._count.events} Events
-							</Tag>
-						</Td>
+							<Td textAlign={"start"}>
+								<Text
+									as={Link}
+									color={"blue.800"}
+									to={`/company/${current.company.id}`}
+								>
+									{current.company.name}
+								</Text>
+							</Td>
+							<Td>
+								<Tag fontWeight={"bold"}>
+									{current.company._count.users} Admins
+								</Tag>
+							</Td>
+							<Td>
+								<Tag fontWeight={"bold"}>
+									{current.company._count.events} Events
+								</Tag>
+							</Td>
 
-						<Td alignItems={"flex-end"} textAlign={"end"}>
-							<IconButton
-								as={Link}
-								to={"/company/edit/" + current.company.id}
-								icon={<Icon as={HiPencilSquare} />}
-								aria-label="Edit Company"
-							/>
-						</Td>
-					</Tr>
-				))}
-		</Tbody>
+							<Td alignItems={"flex-end"} textAlign={"end"}>
+								<IconButton
+									icon={<Icon as={HiPencilSquare} />}
+									aria-label="Edit Company"
+									onClick={() => {
+										setCompany(current.company);
+										editDialog.onOpen();
+									}}
+								/>
+							</Td>
+						</Tr>
+					))}
+			</Tbody>
+		</>
 	);
 };
 

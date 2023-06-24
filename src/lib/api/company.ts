@@ -2,7 +2,7 @@ import axios from "axios";
 import { ILoginResponse } from "./auth";
 import { baseURL } from "$config/api";
 
-interface ICompany {
+export interface ICompany {
 	id: number;
 	owner: number;
 	name: string;
@@ -171,9 +171,40 @@ const deleteCompany = async (
 	}
 };
 
+type IEditCompanyParams = Partial<IAddCompanyParams>;
+
+const editCompany = async (
+	user: ILoginResponse | undefined,
+	companyID: number,
+	data: IEditCompanyParams
+) => {
+	if (user) {
+		const formData = new FormData();
+		let key: keyof typeof data;
+		for (key in data) {
+			formData.append(key, data[key]);
+		}
+
+		const company = await axios
+			.put<IUserCompanyResponse>(
+				`${baseURL}/company/${companyID}`,
+				formData,
+				{
+					headers: {
+						Authorization: `Bearer ${user.token}`,
+					},
+				}
+			)
+			.then((res) => res.data);
+
+		return company;
+	}
+};
+
 export const companyAPI = {
 	getUserCompanies,
 	addCompany,
+	editCompany,
 	getCompanyDetails,
 	addCompanyAdmin,
 	deleteCompany,

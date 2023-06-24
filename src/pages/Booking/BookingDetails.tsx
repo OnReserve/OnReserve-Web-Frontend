@@ -3,8 +3,6 @@ import {
 	Flex,
 	Heading,
 	Img,
-	Spinner,
-	VStack,
 	Text,
 	Box,
 	Icon,
@@ -18,7 +16,7 @@ import {
 import { AuthGuard } from "../../components/AuthGuard";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
-import { Query, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { NavLink, useParams } from "react-router-dom";
 import { bookingAPI } from "$lib/api/booking";
 import { useUser } from "../../state/userState";

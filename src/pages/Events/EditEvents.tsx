@@ -1,10 +1,4 @@
 import {
-	AlertDialog,
-	AlertDialogBody,
-	AlertDialogContent,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogOverlay,
 	Button,
 	ButtonGroup,
 	Flex,
@@ -12,9 +6,7 @@ import {
 	FormLabel,
 	Heading,
 	Icon,
-	Img,
 	Input,
-	Modal,
 	Table,
 	Tbody,
 	Td,
@@ -27,7 +19,7 @@ import {
 import { AuthGuard } from "../../components/AuthGuard";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
-import { Field, Form, Formik, FormikProps, useFormik } from "formik";
+import { FormikProps, useFormik } from "formik";
 import * as yup from "yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useUser } from "../../state/userState";
@@ -36,7 +28,6 @@ import { FormikInput } from "$pages/Auth/components/FormikInput";
 import { eventAPI } from "$lib/api/event";
 import { AxiosError } from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useRef } from "react";
 import { myConstants } from "$config/theme";
 
 export const EditEventPage = () => {
@@ -116,7 +107,7 @@ const AddEventForm = () => {
 				});
 			}
 		},
-		onSuccess(data, variables, context) {
+		onSuccess() {
 			toast({
 				status: "success",
 				title: "Event edited",
@@ -133,7 +124,7 @@ const AddEventForm = () => {
 		},
 	});
 
-	const query = useQuery({
+	useQuery({
 		queryKey: ["eventDetails", eventId],
 		queryFn: () => eventAPI.getEventDetails(parseInt(eventId || "")),
 		onSuccess(data) {
@@ -354,32 +345,6 @@ function SeatInformation({ formik }: { formik: FormikProps<IEditEventForm> }) {
 					</Tr>
 				</Tbody>
 			</Table>
-		</Flex>
-	);
-}
-
-function ImageUpload({ formik }: { formik: FormikProps<IEditEventForm> }) {
-	return (
-		<Flex direction={"column"} mt="10">
-			<FormControl>
-				<FormLabel>Event Photos</FormLabel>
-				<Input
-					name="images"
-					type="file"
-					onChange={(event) => {
-						if (event.target.files) {
-							const files = Array.from(event.target.files);
-							formik.setFieldValue("images", files);
-						}
-					}}
-					multiple
-				/>
-			</FormControl>
-			<Flex wrap={"wrap"} gap="5" mt="5">
-				{formik.values.images.map((_img) => (
-					<Img height={"200px"} src={URL.createObjectURL(_img)} />
-				))}
-			</Flex>
 		</Flex>
 	);
 }

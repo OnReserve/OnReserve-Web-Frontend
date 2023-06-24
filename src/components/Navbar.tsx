@@ -16,12 +16,7 @@ import {
 	IconButton,
 	Input,
 	InputGroup,
-	InputLeftElement,
 	InputRightElement,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuList,
 	Popover,
 	PopoverBody,
 	PopoverContent,
@@ -31,10 +26,8 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import {
-	HiArrowRightCircle,
 	HiArrowRightOnRectangle,
 	HiBars3BottomRight,
-	HiChevronDown,
 	HiMagnifyingGlass,
 	HiUserCircle,
 } from "react-icons/hi2";

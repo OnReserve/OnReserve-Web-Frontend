@@ -26,8 +26,6 @@ import {
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
 import {
-	HiArrowDownOnSquare,
-	HiArrowTopRightOnSquare,
 	HiCheckBadge,
 	HiOutlineStar,
 	HiPencil,
@@ -37,11 +35,11 @@ import {
 import { Footer } from "../../components/Footer";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { IEventUserResponse, eventAPI } from "$lib/api/event";
+import { eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
 import { useUser } from "../../state/userState";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Gallery } from "$lib/api/event";
 import { IReviewRequest, reviewAPI } from "$lib/api/review";
 import { myConstants } from "$config/theme";
@@ -448,7 +446,7 @@ const AddReview = () => {
 			queryClient.invalidateQueries(["loadReviews"]);
 			setComment("");
 		},
-		onError: (error) => {
+		onError: () => {
 			toast({
 				status: "error",
 				title: "We have failed to post your Review",

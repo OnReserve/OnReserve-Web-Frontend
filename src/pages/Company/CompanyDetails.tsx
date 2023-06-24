@@ -1,8 +1,6 @@
 import {
 	Alert,
 	AlertDescription,
-	AlertDialog,
-	AlertDialogOverlay,
 	AlertIcon,
 	Avatar,
 	Box,
@@ -161,7 +159,7 @@ const AddAdminDialog = ({ isOpen, onClose }: IDialogProps) => {
 		mutationKey: ["addCompanyAdmin"],
 		mutationFn: (email: string) =>
 			companyAPI.addCompanyAdmin(user, id ? parseInt(id) : 0, email),
-		onSuccess: (data) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries(["companyDetails"]);
 			toast({
 				status: "success",

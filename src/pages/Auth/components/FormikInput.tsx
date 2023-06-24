@@ -1,5 +1,4 @@
-import { FormikConfig, FormikContextType } from "formik";
-import { loginInitialValues } from "../lib/schema";
+import { FormikContextType } from "formik";
 import {
 	FormControl,
 	FormErrorMessage,

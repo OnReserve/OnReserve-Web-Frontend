@@ -32,7 +32,7 @@ export const useReservation = create(
 				set((state) => ({
 					...state,
 					packages: state.packages.filter(
-						(val, _index) => index != _index
+						(_val, _index) => index != _index
 					),
 				})),
 			clear: () =>

@@ -5,11 +5,9 @@ import {
 	Badge,
 	Box,
 	Flex,
-	HStack,
 	Heading,
 	SimpleGrid,
 	Skeleton,
-	Spinner,
 	Tag,
 	Text,
 } from "@chakra-ui/react";
@@ -19,7 +17,6 @@ import { Footer } from "../../components/Footer";
 import { useUser } from "../../state/userState";
 import { useQuery } from "@tanstack/react-query";
 import { bookingAPI } from "$lib/api/booking";
-import dayjs from "dayjs";
 import { getFromNow } from "$config/dayjs.config";
 import { NavLink } from "react-router-dom";
 

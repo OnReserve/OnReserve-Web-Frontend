@@ -1,4 +1,3 @@
-import { adminAPI } from "$lib/api/admin";
 import { ICategoryResponse, categoryAPI } from "$lib/api/categories";
 import {
 	Alert,
@@ -36,7 +35,7 @@ import {
 	useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Axios, AxiosError } from "axios";
+import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useUser } from "../../state/userState";
@@ -191,7 +190,7 @@ const AddCategoryDialog = (props: Omit<ModalProps, "children">) => {
 		mutationKey: ["AddCategory"],
 		mutationFn: (category: string) =>
 			categoryAPI.addCategory(user, category),
-		onSuccess: (data, variables, context) => {
+		onSuccess: () => {
 			toast({
 				status: "success",
 				title: "Category Added",
@@ -200,7 +199,7 @@ const AddCategoryDialog = (props: Omit<ModalProps, "children">) => {
 			queryClient.invalidateQueries(["loadCategories"]);
 			props.onClose();
 		},
-		onError(error, variables, context) {
+		onError(error) {
 			if (error instanceof AxiosError) {
 				toast({
 					status: "error",
@@ -265,7 +264,7 @@ const EditCategoryDialog = ({
 		mutationKey: ["editCategory", currentCategory.id],
 		mutationFn: (category: string) =>
 			categoryAPI.updateCategory(user, currentCategory.id, category),
-		onSuccess: (data, variables, context) => {
+		onSuccess: () => {
 			toast({
 				status: "success",
 				title: "Category Updated",
@@ -274,7 +273,7 @@ const EditCategoryDialog = ({
 			queryClient.invalidateQueries(["loadCategories"]);
 			props.onClose();
 		},
-		onError(error, variables, context) {
+		onError(error) {
 			if (error instanceof AxiosError) {
 				toast({
 					status: "error",

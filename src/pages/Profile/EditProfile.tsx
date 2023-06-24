@@ -1,6 +1,3 @@
-import { formatDateForUserEvent } from "$config/dayjs.config";
-import { companyAPI } from "$lib/api/company";
-import { eventAPI, IEventUserResponse } from "$lib/api/event";
 import { FormikInput } from "$pages/Auth/components/FormikInput";
 import {
 	Avatar,
@@ -10,8 +7,6 @@ import {
 	Flex,
 	FormControl,
 	FormLabel,
-	Grid,
-	Heading,
 	Icon,
 	Img,
 	Input,
@@ -23,16 +18,14 @@ import {
 	ModalHeader,
 	ModalOverlay,
 	ModalProps,
-	Skeleton,
 	Textarea,
-	useQuery,
 	useToast,
 	Text,
 } from "@chakra-ui/react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useFormik } from "formik";
-import { HiCloudArrowUp, HiPlus } from "react-icons/hi2";
+import { HiCloudArrowUp } from "react-icons/hi2";
 import { useUser } from "../../state/userState";
 import { profileAPI } from "$lib/api/profile";
 
@@ -43,7 +36,6 @@ export const EditProfileDialog = ({
 	const user = useUser((state) => state.user);
 	const setUser = useUser((state) => state.setUser);
 	const toast = useToast();
-	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
 		mutationKey: ["addCompany"],
@@ -68,7 +60,7 @@ export const EditProfileDialog = ({
 						});
 					}
 				},
-				onSuccess: (data, variables, context) => {
+				onSuccess: (data) => {
 					setUser(data);
 					toast({
 						title: "Profile Edited",

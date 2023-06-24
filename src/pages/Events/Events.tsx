@@ -8,15 +8,12 @@ import {
 	AlertDescription,
 	AlertIcon,
 	AlertTitle,
-	Badge,
 	Button,
-	Divider,
 	Flex,
 	FormControl,
 	FormLabel,
 	HStack,
 	Heading,
-	Icon,
 	Img,
 	Input,
 	RangeSlider,
@@ -27,23 +24,20 @@ import {
 	Skeleton,
 	Tag,
 	Text,
-	useRangeSlider,
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
 import {
 	HiCalendar,
 	HiCheckBadge,
-	HiMapPin,
 	HiOutlineClock,
 	HiOutlineMapPin,
 } from "react-icons/hi2";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { Footer } from "../../components/Footer";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCategories } from "$lib/hooks/useCategories";
 import { useFilter } from "../../state/filterState";
 import { myConstants } from "$config/theme";

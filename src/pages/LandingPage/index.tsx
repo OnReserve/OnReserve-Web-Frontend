@@ -2,7 +2,6 @@ import {
 	Flex,
 	Heading,
 	Icon,
-	IconButton,
 	Img,
 	SimpleGrid,
 	Skeleton,
@@ -10,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import {
-	HiArrowRight,
 	HiKey,
 	HiRectangleStack,
 	HiRocketLaunch,

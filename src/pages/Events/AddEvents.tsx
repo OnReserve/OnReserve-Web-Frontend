@@ -15,7 +15,6 @@ import {
 	Select,
 	Spinner,
 	Table,
-	Tag,
 	Tbody,
 	Td,
 	Textarea,
@@ -42,9 +41,8 @@ import { FormikInput } from "$pages/Auth/components/FormikInput";
 import { eventAPI } from "$lib/api/event";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { categoryAPI } from "$lib/api/categories";
-import { useCategories } from "$lib/hooks/useCategories";
 import { myConstants } from "$config/theme";
+import { useCategories } from "$lib/hooks/useCategories";
 
 interface IAddEventPage {
 	isEdit?: boolean;
@@ -156,7 +154,7 @@ const CompanySelect = () => {
 	);
 };
 
-const AddEventForm = ({ isEdit }: { isEdit?: boolean }) => {
+const AddEventForm = ({}: { isEdit?: boolean }) => {
 	const user = useUser((state) => state.user);
 	const navigate = useNavigate();
 	const toast = useToast();
@@ -173,7 +171,7 @@ const AddEventForm = ({ isEdit }: { isEdit?: boolean }) => {
 				});
 			}
 		},
-		onSuccess(data, variables, context) {
+		onSuccess(variables) {
 			toast({
 				status: "success",
 				title: "Event Added",
@@ -404,7 +402,6 @@ function ImageUpload({ formik }: { formik: FormikProps<IAddEventForm> }) {
 }
 
 const CategoryInput = ({ formik }: { formik: FormikProps<IAddEventForm> }) => {
-	const user = useUser((state) => state.user);
 	const category = useCategories();
 	return (
 		<Flex my="10">

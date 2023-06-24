@@ -1,4 +1,4 @@
-import { Flex, Button, Heading, Icon } from "@chakra-ui/react";
+import { Flex, Button, Icon } from "@chakra-ui/react";
 import {
 	HiHomeModern,
 	HiUserGroup,

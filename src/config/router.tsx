@@ -1,4 +1,4 @@
-import { Outlet, createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { LandingPage } from "$pages/LandingPage";
 import { Login } from "$pages/Auth/Login";
 import { SignUp } from "$pages/Auth/SignUp";
@@ -9,7 +9,6 @@ import { ProfileViewPage } from "$pages/Profile/ProfileView";
 import { CompanyDetailsPage } from "$pages/Company/CompanyDetails";
 import { AddEventPage } from "$pages/Events/AddEvents";
 import { EditEventPage } from "$pages/Events/EditEvents";
-import { AdminGuard } from "$pages/Admin/AdminGuard";
 import { AdminPage } from "$pages/Admin";
 import { DashboardOutlet } from "$pages/Admin/DashboardOutlet";
 import { AdminsList } from "$pages/Admin/admins";

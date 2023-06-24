@@ -5,7 +5,7 @@ import { signUpInitialValues, signUpSchema } from "./lib/schema";
 import { FormikInput } from "./components/FormikInput";
 import { userAPI } from "$lib/api/auth";
 import { useUser } from "../../state/userState";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AxiosError } from "axios";
 
 export const SignUp = () => {

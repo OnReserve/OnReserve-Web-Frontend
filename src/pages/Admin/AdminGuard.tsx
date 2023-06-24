@@ -1,6 +1,6 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { useUser } from "../../state/userState";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
 	Alert,
 	AlertDescription,
@@ -13,7 +13,6 @@ import {
 
 export const AdminGuard = ({ children }: { children?: ReactNode }) => {
 	const user = useUser((state) => state.user);
-	const navigate = useNavigate();
 
 	if (!user || user.role != "SUPERADMIN") {
 		return (

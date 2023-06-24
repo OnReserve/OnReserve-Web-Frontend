@@ -7,7 +7,6 @@ import {
 	Button,
 	ButtonGroup,
 	Flex,
-	FormControl,
 	Heading,
 	Icon,
 	Input,

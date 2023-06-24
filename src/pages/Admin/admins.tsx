@@ -30,8 +30,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiPlus } from "react-icons/hi2";
 import { useUser } from "../../state/userState";
 import { useState } from "react";
-import { date } from "yup";
-import { Axios, AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 export const AdminsList = () => {
 	const addAdminDialog = useDisclosure();
@@ -92,10 +91,10 @@ const AdminsTable = () => {
 	const removeAdminMutation = useMutation({
 		mutationKey: ["removeAdmin"],
 		mutationFn: (id: number) => adminAPI.deleteAdmin(user, id),
-		onSuccess: (data, variables, context) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries(["loadSuperAdmins"]);
 		},
-		onError(error, variables, context) {
+		onError(error) {
 			if (error instanceof AxiosError) {
 				console.log(error);
 			}
@@ -167,7 +166,7 @@ const AddAdminDialog = (props: Omit<ModalProps, "children">) => {
 	const addMutation = useMutation({
 		mutationKey: ["AddSuperAdmin"],
 		mutationFn: (email: string) => adminAPI.addAdmin(user, email),
-		onSuccess: (data, variables, context) => {
+		onSuccess: () => {
 			toast({
 				status: "success",
 				title: "Super admin Added",
@@ -175,7 +174,7 @@ const AddAdminDialog = (props: Omit<ModalProps, "children">) => {
 			queryClient.invalidateQueries(["loadSuperAdmins"]);
 			props.onClose();
 		},
-		onError(error, variables, context) {
+		onError(error) {
 			if (error instanceof AxiosError) {
 				toast({
 					status: "error",

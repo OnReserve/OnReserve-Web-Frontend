@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { Navbar } from "../../components/Navbar";
 import { HiCheckBadge, HiPlus, HiTrash, HiXCircle } from "react-icons/hi2";
-import { redirect, useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Footer } from "../../components/Footer";
 import { useReservation } from "../../state/reservationState";
 import { useEffect, useMemo, useState } from "react";
@@ -34,7 +34,6 @@ export const ReservationPage = () => {
 	const { eventId } = useParams();
 	const user = useUser((state) => state.user);
 	const clear = useReservation((state) => state.clear);
-	const navigate = useNavigate();
 	const [total, setTotal] = useState(0);
 	const packages = useReservation((state) => state.packages);
 	let query = useQuery({
@@ -79,9 +78,9 @@ export const ReservationPage = () => {
 					.length,
 			},
 			{
-				onSuccess: (data, variables, context) => {
+				onSuccess: (data, variables) => {
 					window.location.assign(
-						`https://yenepay.com/checkout/Home/Process/?ItemName=Booking-Ticket-For-Event-${variables.eventId}&ItemId=${data.bookingToken}&UnitPrice=${total}&Quantity=1&Process=Express&ExpiresAfter=&DeliveryFee=&HandlingFee=&Tax1=&Tax2=&Discount=&SuccessUrl=&IPNUrl=&MerchantId=26459`
+						`https://yenepay.com/checkout/Home/Process/?ItemName=Booking-Ticket-For-Event-${variables.eventId}&ItemId=${data.bookingToken}&UnitPrice=${total}&Quantity=1&Process=Express&ExpiresAfter=&DeliveryFee=&HandlingFee=&Tax1=&Tax2=&Discount=&SuccessUrl=&IPNUrl=&MerchantId=25581`
 					);
 				},
 			}
@@ -177,7 +176,6 @@ export const ReservationPage = () => {
 };
 
 const PackagesList = ({ event }: { event: IEventUserResponse }) => {
-	const [type, setType] = useState("");
 	const [total, setTotal] = useState(0);
 	const packages = useReservation((state) => state.packages);
 	const addPackage = useReservation((state) => state.addPackage);

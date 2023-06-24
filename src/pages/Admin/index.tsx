@@ -1,5 +1,4 @@
 import {
-	Button,
 	Flex,
 	Heading,
 	Spinner,
@@ -8,9 +7,6 @@ import {
 	StatLabel,
 	StatNumber,
 } from "@chakra-ui/react";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
-import { HiHomeModern, HiTicket, HiUserGroup } from "react-icons/hi2";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "../../state/userState";
 import { adminAPI } from "$lib/api/admin";

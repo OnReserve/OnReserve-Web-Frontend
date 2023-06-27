@@ -40,7 +40,7 @@ import {
 import { FormikInput } from "$pages/Auth/components/FormikInput";
 import { eventAPI } from "$lib/api/event";
 import { AxiosError } from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { myConstants } from "$config/theme";
 import { useCategories } from "$lib/hooks/useCategories";
 
@@ -109,7 +109,8 @@ export const validationSchema = yup.object().shape({
 	venue: yup.string(),
 	latitude: yup.number(),
 	longitude: yup.number(),
-	images: yup.array(),
+	images: yup.array().required("please insert at least one image"),
+	categories: yup.array().required("Please select at least one category"),
 });
 
 const CompanySelect = () => {
@@ -184,9 +185,20 @@ const AddEventForm = ({}: { isEdit?: boolean }) => {
 		<Formik
 			initialValues={initialValues}
 			validationSchema={validationSchema}
-			onSubmit={(values) => {
-				console.log(values);
-				mutation.mutate(values);
+			onSubmit={(values, actions) => {
+				if (values.images.length > 0 && values.categories.length > 0) {
+					mutation.mutate(values);
+				} else if (values.categories.length == 0) {
+					actions.setFieldError(
+						"categories",
+						"Please choose at least one category"
+					);
+				} else {
+					actions.setFieldError(
+						"images",
+						"Please Insert at least one image"
+					);
+				}
 			}}
 		>
 			{(formik) => (
@@ -208,12 +220,14 @@ const AddEventForm = ({}: { isEdit?: boolean }) => {
 							colorScheme="blue"
 							leftIcon={<Icon as={HiCalendarDays} />}
 							type="submit"
-							isLoading={formik.isSubmitting}
+							isLoading={mutation.isLoading}
 							loadingText="Creating"
 						>
 							Create an Event
 						</Button>
-						<Button>Cancel</Button>
+						<Button as={Link} to={"/profile"}>
+							Cancel
+						</Button>
 					</ButtonGroup>
 				</Flex>
 			)}
@@ -378,7 +392,9 @@ function SeatInformation() {
 function ImageUpload({ formik }: { formik: FormikProps<IAddEventForm> }) {
 	return (
 		<Flex direction={"column"} mt="10">
-			<FormControl>
+			<FormControl
+				isInvalid={formik.touched.images && !!formik.errors.images}
+			>
 				<FormLabel>Event Photos</FormLabel>
 				<Input
 					name="images"
@@ -391,6 +407,9 @@ function ImageUpload({ formik }: { formik: FormikProps<IAddEventForm> }) {
 					}}
 					multiple
 				/>
+				{!!formik.errors.images && (
+					<FormErrorMessage>{formik.errors.images}</FormErrorMessage>
+				)}
 			</FormControl>
 			<Flex wrap={"wrap"} gap="5" mt="5">
 				{formik.values.images.map((_img) => (
@@ -405,7 +424,12 @@ const CategoryInput = ({ formik }: { formik: FormikProps<IAddEventForm> }) => {
 	const category = useCategories();
 	return (
 		<Flex my="10">
-			<FormControl isDisabled={category.isLoading}>
+			<FormControl
+				isDisabled={category.isLoading}
+				isInvalid={
+					formik.touched.categories && !!formik.errors.categories
+				}
+			>
 				<FormLabel mb="3">Event Category</FormLabel>
 				<Flex flexWrap={"wrap"} gap={"3"}>
 					{category.data &&
@@ -466,6 +490,11 @@ const CategoryInput = ({ formik }: { formik: FormikProps<IAddEventForm> }) => {
 							</Button>
 						))}
 				</Flex>
+				{formik.errors.categories && (
+					<FormErrorMessage>
+						{formik.errors.categories}
+					</FormErrorMessage>
+				)}
 			</FormControl>
 		</Flex>
 	);

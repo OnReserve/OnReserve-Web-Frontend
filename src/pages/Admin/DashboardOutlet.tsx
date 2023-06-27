@@ -9,7 +9,7 @@ import { Footer } from "../../components/Footer";
 import { Navbar } from "../../components/Navbar";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AdminGuard } from "./AdminGuard";
-import { FaMoneyBill, FaMoneyBillWave } from "react-icons/fa";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 export const DashboardOutlet = () => {
 	const location = useLocation();

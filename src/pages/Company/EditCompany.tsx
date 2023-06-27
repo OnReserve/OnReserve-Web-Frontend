@@ -1,4 +1,8 @@
-import { ICompany, companyAPI } from "$lib/api/company";
+import {
+	ICompany,
+	ICompanyDetailsResponse,
+	companyAPI,
+} from "$lib/api/company";
 import { FormikInput } from "$pages/Auth/components/FormikInput";
 import {
 	Avatar,
@@ -33,7 +37,9 @@ import { useEffect } from "react";
 export const EditCompanyDialog = ({
 	company,
 	...props
-}: Omit<ModalProps, "children"> & { company: ICompany }) => {
+}: Omit<ModalProps, "children"> & {
+	company: ICompany | ICompanyDetailsResponse;
+}) => {
 	const user = useUser((state) => state.user);
 	const toast = useToast();
 	const queryClient = useQueryClient();
@@ -63,6 +69,10 @@ export const EditCompanyDialog = ({
 				},
 				onSuccess: () => {
 					queryClient.invalidateQueries(["userCompany"]);
+					queryClient.invalidateQueries([
+						"companyDetails",
+						company.id.toString(),
+					]);
 					toast({
 						title: "Event Edited",
 						status: "success",

@@ -44,6 +44,7 @@ import { Field, Form, Formik } from "formik";
 import { AxiosError } from "axios";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import { myConstants } from "$config/theme";
+import { EditCompanyDialog } from "./EditCompany";
 
 export const CompanyDetailsPage = () => {
 	return (
@@ -263,6 +264,7 @@ const EventsList = ({ events }: { events: EventResponse[] }) => {
 
 const CompanyProfileCard = ({ data }: { data: ICompanyDetailsResponse }) => {
 	const deleteDialog = useDisclosure();
+	const editDialog = useDisclosure();
 	return (
 		<Flex
 			flex={1}
@@ -276,6 +278,7 @@ const CompanyProfileCard = ({ data }: { data: ICompanyDetailsResponse }) => {
 				onClose={deleteDialog.onClose}
 				isOpen={deleteDialog.isOpen}
 			/>
+			<EditCompanyDialog {...editDialog} company={data} />
 			<Box position={"relative"} mb="10">
 				<Img
 					borderTopRadius={"xl"}
@@ -303,12 +306,11 @@ const CompanyProfileCard = ({ data }: { data: ICompanyDetailsResponse }) => {
 					</Flex>
 					<ButtonGroup>
 						<IconButton
-							as={Link}
-							to="/profile/edit"
 							aria-label="Edit Profile"
 							variant={"ghost"}
 							colorScheme={"blue"}
 							icon={<Icon as={HiPencilSquare} boxSize={"5"} />}
+							onClick={editDialog.onOpen}
 						/>
 						<IconButton
 							aria-label="Delete Company"
@@ -393,7 +395,13 @@ const DeleteCompanyDialog = ({ onClose, isOpen }: IDialogProps) => {
 
 function EventCard({ event }: { event: EventResponse }) {
 	return (
-		<Flex direction={"column"} boxShadow={"xs"} borderRadius={"lg"}>
+		<Flex
+			as={Link}
+			to={`/events/${event.id}`}
+			direction={"column"}
+			boxShadow={"xs"}
+			borderRadius={"lg"}
+		>
 			<Img
 				borderTopRadius={"lg"}
 				width={"100%"}

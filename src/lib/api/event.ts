@@ -237,6 +237,68 @@ const getEvents = async (params: GetEvents) => {
 		return events;
 	}
 };
+export interface EventPaymentInfo {
+	requested?: undefined;
+	vipCount: number;
+	economyCount: number;
+	totalRevenue: number;
+}
+export interface EventPaymentInfoIfExist {
+	message: string;
+	requested: boolean;
+	data: {
+		id: number;
+		amount: number;
+		cbe_account: string;
+		cbe_fullname: string;
+		paid: boolean;
+		eventId: number;
+	};
+	stat: {
+		vipCount: number;
+		economyCount: number;
+		totalRevenue: number;
+	};
+}
+
+const getEventPaymentInfo = async (
+	user: ILoginResponse | undefined,
+	eventId: number
+) => {
+	if (user) {
+		const stat = await axios
+			.get<EventPaymentInfo | EventPaymentInfoIfExist>(
+				`${baseURL}/event/${eventId}/payment`,
+				{
+					headers: {
+						Authorization: `Bearer ${user.token}`,
+					},
+				}
+			)
+			.then((res) => res.data);
+
+		return stat;
+	}
+};
+
+const requestPayment = async (
+	user: ILoginResponse | undefined,
+	eventId: number,
+	data: {
+		cbeAccountNo: string;
+		cbeFullName: string;
+	}
+) => {
+	if (user) {
+		return await axios
+			.post(`${baseURL}/event/${eventId}/payment`, data, {
+				headers: {
+					Authorization: `Bearer ${user.token}`,
+				},
+			})
+			.then((res) => res.data);
+	}
+};
 
 export const eventAPI = {
 	addEvent,
@@ -247,4 +309,6 @@ export const eventAPI = {
 	getEventDetails,
 	addBooking,
 	getEvents,
+	getEventPaymentInfo,
+	requestPayment,
 };

@@ -120,6 +120,48 @@ const approveTicket = async (user: ILoginResponse | undefined, id: number) => {
 	}
 };
 
+interface PaymentRequestResponse {
+	id: number;
+	amount: number;
+	cbe_account: string;
+	cbe_fullname: string;
+	paid: boolean;
+	eventId: number;
+}
+
+const getPaymentRequests = async (user: ILoginResponse | undefined) => {
+	if (user && user.role === "SUPERADMIN") {
+		return await axios
+			.get<PaymentRequestResponse[]>(
+				`${baseURL}/admin/payment-requests`,
+				{
+					headers: {
+						Authorization: `Bearer ${user.token}`,
+					},
+				}
+			)
+			.then((res) => res.data);
+	}
+};
+
+const approveRequest = async (user: ILoginResponse | undefined, id: number) => {
+	if (user && user.role === "SUPERADMIN") {
+		return await axios
+			.post(
+				`${baseURL}/admin/payment-requests`,
+				{
+					id,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${user.token}`,
+					},
+				}
+			)
+			.then((res) => res.data);
+	}
+};
+
 export const adminAPI = {
 	loadStats,
 	loadAdmins,
@@ -127,4 +169,6 @@ export const adminAPI = {
 	deleteAdmin,
 	loadBookings,
 	approveTicket,
+	getPaymentRequests,
+	approveRequest,
 };

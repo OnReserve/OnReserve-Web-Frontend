@@ -29,6 +29,8 @@ import { IEventUserResponse, eventAPI } from "$lib/api/event";
 import { formatDateForUserEvent } from "$config/dayjs.config";
 import dayjs from "dayjs";
 import { useUser } from "../../state/userState";
+import { myConstants } from "$config/theme";
+import { AuthGuard } from "../../components/AuthGuard";
 
 export const ReservationPage = () => {
 	const { eventId } = useParams();
@@ -78,9 +80,9 @@ export const ReservationPage = () => {
 					.length,
 			},
 			{
-				onSuccess: (data, variables) => {
+				onSuccess: (data) => {
 					window.location.assign(
-						`https://yenepay.com/checkout/Home/Process/?ItemName=Booking-Ticket-For-Event-${variables.eventId}&ItemId=${data.bookingToken}&UnitPrice=${total}&Quantity=1&Process=Express&ExpiresAfter=&DeliveryFee=&HandlingFee=&Tax1=&Tax2=&Discount=&SuccessUrl=&IPNUrl=&MerchantId=25581`
+						`https://yenepay.com/checkout/Home/Process/?ItemName=Booking-Ticket-For-Event-${data.bookingToken}&ItemId=${data.bookingToken}&UnitPrice=${total}&Quantity=1&Process=Express&ExpiresAfter=&DeliveryFee=&HandlingFee=&Tax1=&Tax2=&Discount=&SuccessUrl=&IPNUrl=&MerchantId=25581`
 					);
 				},
 			}
@@ -88,90 +90,101 @@ export const ReservationPage = () => {
 	};
 
 	return (
-		<Flex direction={"column"}>
-			<Navbar />
-			<Flex px="20" py="10" gap={"10"}>
-				{query.isLoading ? (
-					<Spinner />
-				) : (
-					query.data && (
-						<>
-							<Flex direction={"column"} flex="1">
-								<Img
-									borderRadius={"lg"}
-									src={`${query.data?.galleries[0].eventPhoto}`}
-									width={"100%"}
-								/>
-								<Heading mt="6" mb="2" size={"md"}>
-									{query.data?.title}
-								</Heading>
-								<Text
-									color="blue.500"
-									fontWeight={"bold"}
-									mb="6"
-								>
-									{query.data?.company?.name}
-									<Icon fontSize={"xl"}>
-										<HiCheckBadge />
-									</Icon>
-								</Text>
-
-								<Flex direction={"column"} my="4" gap={"4"}>
-									<Stat>
-										<StatLabel>Event Location</StatLabel>
-										<StatNumber>
-											{query.data?.locations &&
-												`${query.data?.locations[0]?.venue}`}
-											,{" "}
-											{query.data?.locations &&
-												`${query.data?.locations[0]?.city}`}
-										</StatNumber>
-									</Stat>
-									<Stat>
-										<StatLabel>Event Date</StatLabel>
-										<StatNumber>
-											{formatDateForUserEvent(
-												query.data.eventStartTime
-											)}
-										</StatNumber>
-									</Stat>
-									<Stat>
-										<StatLabel>Event Time</StatLabel>
-										<StatNumber>
-											{dayjs(
-												query.data.eventStartTime
-											).format("hh:mm A")}
-										</StatNumber>
-									</Stat>
-								</Flex>
-							</Flex>
-							<Flex flex="2" direction={"column"}>
-								<Flex
-									as={"section"}
-									direction={"column"}
-									mb="8"
-								>
-									<Heading size={"lg"} mb="5">
-										Your Packages
+		<AuthGuard>
+			<Flex direction={"column"}>
+				<Navbar />
+				<Flex
+					px={myConstants.pagePadding}
+					direction={["column-reverse", "column-reverse", "row"]}
+					py="10"
+					gap={"10"}
+				>
+					{query.isLoading ? (
+						<Spinner />
+					) : (
+						query.data && (
+							<>
+								<Flex direction={"column"} flex="1">
+									<Img
+										borderRadius={"lg"}
+										src={`${query.data?.galleries[0].eventPhoto}`}
+										width={"100%"}
+									/>
+									<Heading mt="6" mb="2" size={"md"}>
+										{query.data?.title}
 									</Heading>
-									<PackagesList event={query.data} />
-									<Button
-										my="20"
-										background={"blue.900"}
-										colorScheme="blue"
-										onClick={() => handlePayment()}
-										isLoading={bookingMutation.isLoading}
+									<Text
+										color="blue.500"
+										fontWeight={"bold"}
+										mb="6"
 									>
-										Continue to Payment
-									</Button>
+										{query.data?.company?.name}
+										<Icon fontSize={"xl"}>
+											<HiCheckBadge />
+										</Icon>
+									</Text>
+
+									<Flex direction={"column"} my="4" gap={"4"}>
+										<Stat>
+											<StatLabel>
+												Event Location
+											</StatLabel>
+											<StatNumber>
+												{query.data?.locations &&
+													`${query.data?.locations[0]?.venue}`}
+												,{" "}
+												{query.data?.locations &&
+													`${query.data?.locations[0]?.city}`}
+											</StatNumber>
+										</Stat>
+										<Stat>
+											<StatLabel>Event Date</StatLabel>
+											<StatNumber>
+												{formatDateForUserEvent(
+													query.data.eventStartTime
+												)}
+											</StatNumber>
+										</Stat>
+										<Stat>
+											<StatLabel>Event Time</StatLabel>
+											<StatNumber>
+												{dayjs(
+													query.data.eventStartTime
+												).format("hh:mm A")}
+											</StatNumber>
+										</Stat>
+									</Flex>
 								</Flex>
-							</Flex>
-						</>
-					)
-				)}
+								<Flex flex="2" direction={"column"}>
+									<Flex
+										as={"section"}
+										direction={"column"}
+										mb="8"
+									>
+										<Heading size={"lg"} mb="5">
+											Your Packages
+										</Heading>
+										<PackagesList event={query.data} />
+										<Button
+											my="20"
+											background={"blue.900"}
+											colorScheme="blue"
+											onClick={() => handlePayment()}
+											isLoading={
+												bookingMutation.isLoading
+											}
+										>
+											Continue to Payment
+										</Button>
+									</Flex>
+								</Flex>
+							</>
+						)
+					)}
+				</Flex>
+				<Footer />
 			</Flex>
-			<Footer />
-		</Flex>
+		</AuthGuard>
 	);
 };
 

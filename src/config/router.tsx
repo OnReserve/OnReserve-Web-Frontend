@@ -16,6 +16,8 @@ import { AdminBookingPage } from "$pages/Admin/AdminBookings";
 import { BookingPage } from "$pages/Booking/BookingsList";
 import { AdminCategories } from "$pages/Admin/AdminCategories";
 import { BookingDetails } from "$pages/Booking/BookingDetails";
+import { RequestPayment } from "$pages/Events/RequestPayment";
+import { AdminRequestPage } from "$pages/Admin/AdminPayment";
 
 const routerConfig = createBrowserRouter([
 	{
@@ -45,6 +47,10 @@ const routerConfig = createBrowserRouter([
 	{
 		path: "/event/edit/:eventId",
 		element: <EditEventPage />,
+	},
+	{
+		path: "/event/payment/:eventId",
+		element: <RequestPayment />,
 	},
 	{
 		path: "/reserve/:eventId",
@@ -85,6 +91,10 @@ const routerConfig = createBrowserRouter([
 			{
 				path: "/admin/categories",
 				element: <AdminCategories />,
+			},
+			{
+				path: "/admin/payment-request",
+				element: <AdminRequestPage />,
 			},
 		],
 	},

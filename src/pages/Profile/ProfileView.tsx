@@ -518,7 +518,13 @@ function UserEvents({}) {
 
 function EventCard({ event }: { event: IEventUserResponse }) {
 	return (
-		<Flex direction={"column"} borderRadius={"lg"} boxShadow={"base"}>
+		<Flex
+			as={Link}
+			to={`/events/${event.id}`}
+			direction={"column"}
+			borderRadius={"lg"}
+			boxShadow={"base"}
+		>
 			<Img
 				borderTopRadius={"lg"}
 				width={"100%"}

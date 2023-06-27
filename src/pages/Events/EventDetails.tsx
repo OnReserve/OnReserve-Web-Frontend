@@ -27,6 +27,7 @@ import {
 import { Navbar } from "../../components/Navbar";
 import {
 	HiCheckBadge,
+	HiCurrencyDollar,
 	HiOutlineStar,
 	HiPencil,
 	HiStar,
@@ -51,6 +52,7 @@ export const EventsDetailsPage = () => {
 		queryKey: ["eventDetails", eventId],
 		queryFn: () => eventAPI.getEventDetails(parseInt(eventId || "0")),
 	});
+
 	const deleteDialog = useDisclosure();
 
 	return (
@@ -130,12 +132,42 @@ export const EventsDetailsPage = () => {
 									</Heading>
 									{user?.id == query.data.userId && (
 										<ButtonGroup>
+											{new Date().getTime() >
+												new Date(
+													query.data.eventEndTime
+												).getTime() && (
+												<Button
+													leftIcon={
+														<Icon
+															as={
+																HiCurrencyDollar
+															}
+														/>
+													}
+													size={"sm"}
+													colorScheme="green"
+													variant={"solid"}
+													as={Link}
+													to={`/event/payment/${eventId}`}
+												>
+													<Text
+														display={[
+															"none",
+															"none",
+															"inline-block",
+														]}
+													>
+														Withdraw Money
+													</Text>
+												</Button>
+											)}
 											<Button
 												leftIcon={
 													<Icon as={HiPencil}></Icon>
 												}
-												variant={"solid"}
+												variant={"outline"}
 												colorScheme="blue"
+												size={"sm"}
 												as={Link}
 												to={`/event/edit/${query.data.id}`}
 											>
@@ -151,6 +183,7 @@ export const EventsDetailsPage = () => {
 											</Button>
 											<Button
 												leftIcon={<Icon as={HiTrash} />}
+												size={"sm"}
 												colorScheme="red"
 												variant={"ghost"}
 												onClick={deleteDialog.onOpen}
@@ -319,7 +352,11 @@ export const EventsDetailsPage = () => {
 										: "Reserve"}
 								</Button>
 							</Flex>
-							<EventReviews />
+							{user &&
+								new Date().getTime() >
+									new Date(
+										query.data.eventEndTime
+									).getTime() && <EventReviews />}
 						</Flex>
 					</>
 				)}

@@ -89,18 +89,21 @@ const PopularList = () => {
 
 	return (
 		<>
-			{popular.data &&
-				popular.data.map((_event) => (
-					<PopularListCard
+			{
+			popular.data &&
+				popular.data.map((_event) => {
+					console.log(_event);
+				return	<PopularListCard
 						key={_event.id}
 						id={_event.id}
-						bgUrl={_event.galleries[0].eventPhoto}
+						bgUrl={_event.galleries.length == 0 ? "" : _event.galleries[0].eventPhoto}
 						title={_event.title}
 						type={_event.company?.name || ""}
 						date={dayjs(_event.eventStartTime).date()}
 						month={dayjs(_event.eventStartTime).format("MMM")}
 					/>
-				))}
+				}
+				)}
 		</>
 	);
 };
